@@ -1,7 +1,7 @@
 #ifndef SPRITE_H
 #define SPRITE_H
 
-typedef struct {
+typedef struct Sprite{
     int height;
     int width;
     char *pixels;

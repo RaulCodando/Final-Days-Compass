@@ -12,7 +12,7 @@ void print_sprite(Sprite *sprite){
 }
 
 void test_sprite_create(){
-    Sprite *sprite = sprite_create("tests/assets/test_sprite.txt");
+    Sprite *sprite = sprite_create("tests/assets/test_sprite01.txt");
     if(sprite == NULL){
         printf("Error: Could not create sprite.\n");
         return;
