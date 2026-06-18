@@ -21,6 +21,9 @@ void test_renderer_draw(){
     Renderer *renderer = renderer_create(10, 10);
     Sprite *sprite = sprite_create("tests/assets/test_sprite02.txt");
 
+    assert(renderer != NULL);
+    assert(sprite != NULL);
+
     renderer_draw(renderer, 5, 5, sprite);
 
     assert(renderer->buffer[5][5] == 'A');
@@ -39,6 +42,9 @@ void test_renderer_draw(){
 void test_renderer_clear(){
     Renderer *renderer = renderer_create(10, 10);
     Sprite *sprite = sprite_create("tests/assets/test_sprite02.txt");
+
+    assert(renderer != NULL);
+    assert(sprite != NULL);
 
     renderer_draw(renderer, 5, 5, sprite);
 
@@ -59,6 +65,9 @@ void test_renderer_clear(){
 void test_renderer_present(){
     Renderer *renderer = renderer_create(10, 10);
     Sprite *sprite = sprite_create("tests/assets/test_sprite02.txt");
+
+    assert(renderer != NULL);
+    assert(sprite != NULL);
 
     renderer_draw(renderer, 5, 5, sprite);
 
