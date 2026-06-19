@@ -1,6 +1,7 @@
 #include "graphics/test_sprite.h"
 #include "graphics/test_renderer.h"
 #include "core/test_game.h"
+#include "input/test_keyboard.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -20,5 +21,7 @@ int main(){
     test_renderer();
     ask_for_permission();
     test_game();
+    ask_for_permission();
+    test_keyboard();
     return 0;
 }
