@@ -2,6 +2,7 @@
 #include "graphics/test_renderer.h"
 #include "core/test_game.h"
 #include "input/test_keyboard.h"
+#include "input/test_commands.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -20,8 +21,10 @@ int main(){
     ask_for_permission();
     test_renderer();
     ask_for_permission();
-    test_game();
-    ask_for_permission();
     test_keyboard();
+    ask_for_permission();
+    test_commands();
+    ask_for_permission();
+    test_game();
     return 0;
 }
