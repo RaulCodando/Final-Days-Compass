@@ -6,9 +6,9 @@
 //Test variables
 static float test_x = 0.0f;
 static float test_y = 0.0f;
-static float speed = 20.0f;
+static float speed = 10.0f;
+static float accumulator = 0.0f;
 static Sprite *test_sprite = NULL;
-static float accumulated_time = 0.0f;
 
 Game *game_create(void){
     Game *game = (Game*) malloc(sizeof(Game));
@@ -26,6 +26,9 @@ Game *game_create(void){
         free(game);
         return NULL;
     }
+
+    keyboard_init(&game->keyboard);
+    commands_init(&game->commands);
 
     game->is_running = true;
 
@@ -47,17 +50,30 @@ void game_destroy(Game *game){
 }
 
 void game_update(Game *game){
-    test_x += speed * game->delta_time;
+    if(!game) return;
 
-    if (test_x >= SCREEN_WIDTH) {
-        test_x = 0.0f;
-    }
-
-    accumulated_time += game->delta_time;
-
-    if (accumulated_time >= 10.0f) {
+    if (game->commands.quit_game.active) {
         game->is_running = false;
+        return;
     }
+
+    if (game->commands.move_left.active) {
+        test_x -= 2 * speed * game->delta_time;
+    }
+    if (game->commands.move_right.active) {
+        test_x += 2 * speed * game->delta_time;
+    }
+    if (game->commands.move_up.active) {
+        test_y -= speed * game->delta_time;
+    }
+    if (game->commands.move_down.active) {
+        test_y += speed * game->delta_time;
+    }
+
+    if(test_x >= SCREEN_WIDTH) test_x = 0.0f;
+    if(test_x < 0) test_x = SCREEN_WIDTH - 1.0f;
+    if(test_y >= SCREEN_HEIGHT) test_y = 0.0f;
+    if(test_y < 0) test_y = SCREEN_HEIGHT - 1.0f;
 }
 
 void game_draw(Game *game){
@@ -75,17 +91,34 @@ void game_loop(Game *game){
     QueryPerformanceCounter(&current_time);
 
     long long elapsed_ticks = current_time.QuadPart - game->last_time.QuadPart;
-    game->delta_time = (float) elapsed_ticks / (float) game->frequency.QuadPart;
-
+    float frame_time = (float) elapsed_ticks / (float) game->frequency.QuadPart;
     game->last_time = current_time;
 
-    game_update(game);
+    accumulator += frame_time;
+    
+    while (accumulator >= FIXED_TIME_STEP) {
+        game->delta_time = FIXED_TIME_STEP;
+        game_update(game);
+        accumulator -= FIXED_TIME_STEP;
+    }
+
     game_draw(game);
+
+    LARGE_INTEGER end_time;
+    QueryPerformanceCounter(&end_time);
+
+    float frame_process_time = (float)(end_time.QuadPart - current_time.QuadPart) / (float)game->frequency.QuadPart;
+    if (frame_process_time < TARGET_FRAME_TIME) {
+        float sleep_time = TARGET_FRAME_TIME - frame_process_time;
+        Sleep((DWORD)(sleep_time * 1000.0f)); 
+    }
 }
 
 void game_run(Game *game){
     if(game == NULL) return;
     while(game->is_running){
+        keyboard_update(&game->keyboard);
+        commands_update(&game->commands, &game->keyboard);
         game_loop(game);
     }
 }

@@ -2,13 +2,16 @@
 #define GAME_H
 
 #include "../graphics/renderer.h"
+#include "../input/commands.h"
+#include "../input/keyboard.h"
 #include <stdbool.h>
 #include <windows.h>
 
 typedef struct Game{
     bool is_running;
     Renderer *renderer;
-
+    InputKeyboardState keyboard;
+    Commands commands;
     LARGE_INTEGER frequency;
     LARGE_INTEGER last_time;
     float delta_time;
