@@ -6,7 +6,8 @@
 //Test variables
 static float test_x = 0.0f;
 static float test_y = 0.0f;
-static float speed = 20.0f;
+static float speed = 10.0f;
+static float accumulator = 0.0f;
 static Sprite *test_sprite = NULL;
 
 Game *game_create(void){
@@ -57,10 +58,10 @@ void game_update(Game *game){
     }
 
     if (game->commands.move_left.active) {
-        test_x -= speed * game->delta_time;
+        test_x -= 2 * speed * game->delta_time;
     }
     if (game->commands.move_right.active) {
-        test_x += speed * game->delta_time;
+        test_x += 2 * speed * game->delta_time;
     }
     if (game->commands.move_up.active) {
         test_y -= speed * game->delta_time;
@@ -90,12 +91,27 @@ void game_loop(Game *game){
     QueryPerformanceCounter(&current_time);
 
     long long elapsed_ticks = current_time.QuadPart - game->last_time.QuadPart;
-    game->delta_time = (float) elapsed_ticks / (float) game->frequency.QuadPart;
-
+    float frame_time = (float) elapsed_ticks / (float) game->frequency.QuadPart;
     game->last_time = current_time;
 
-    game_update(game);
+    accumulator += frame_time;
+    
+    while (accumulator >= FIXED_TIME_STEP) {
+        game->delta_time = FIXED_TIME_STEP;
+        game_update(game);
+        accumulator -= FIXED_TIME_STEP;
+    }
+
     game_draw(game);
+
+    LARGE_INTEGER end_time;
+    QueryPerformanceCounter(&end_time);
+
+    float frame_process_time = (float)(end_time.QuadPart - current_time.QuadPart) / (float)game->frequency.QuadPart;
+    if (frame_process_time < TARGET_FRAME_TIME) {
+        float sleep_time = TARGET_FRAME_TIME - frame_process_time;
+        Sleep((DWORD)(sleep_time * 1000.0f)); 
+    }
 }
 
 void game_run(Game *game){

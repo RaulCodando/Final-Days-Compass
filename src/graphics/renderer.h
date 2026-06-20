@@ -1,13 +1,15 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
+#include <windows.h>
+
 // forward declaration
 struct Sprite;
 
 typedef struct Renderer {
     int viewport_width;
     int viewport_height;
-    char **buffer;
+    CHAR_INFO *buffer;
 }Renderer;
 
 Renderer *renderer_create(int width, int height);
