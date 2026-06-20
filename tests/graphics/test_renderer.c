@@ -26,10 +26,11 @@ void test_renderer_draw(){
 
     renderer_draw(renderer, 5, 5, sprite);
 
-    assert(renderer->buffer[5][5] == 'A');
-    assert(renderer->buffer[5][6] == 'B');
-    assert(renderer->buffer[6][5] == ' ');
-    assert(renderer->buffer[6][6] == 'C');
+    // CORREÇÃO: Mapeamento linear -> (Y * Largura + X) acessando .Char.AsciiChar
+    assert(renderer->buffer[5 * renderer->viewport_width + 5].Char.AsciiChar == 'A');
+    assert(renderer->buffer[5 * renderer->viewport_width + 6].Char.AsciiChar == 'B');
+    assert(renderer->buffer[6 * renderer->viewport_width + 5].Char.AsciiChar == ' ');
+    assert(renderer->buffer[6 * renderer->viewport_width + 6].Char.AsciiChar == 'C');
 
     renderer_draw(renderer, 9, 9, sprite);
 
@@ -52,7 +53,8 @@ void test_renderer_clear(){
 
     for(int i = 0; i < renderer->viewport_height; i++){
         for(int j = 0; j < renderer->viewport_width; j++){
-            assert(renderer->buffer[i][j] == BLANK_CHARACTER);
+            int index = i * renderer->viewport_width + j;
+            assert(renderer->buffer[index].Char.AsciiChar == BLANK_CHARACTER);
         }
     }
 

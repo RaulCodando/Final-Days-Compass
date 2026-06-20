@@ -6,7 +6,7 @@
 //Test variables
 static float test_x = 0.0f;
 static float test_y = 0.0f;
-static float speed = 10.0f;
+static float speed = 15.0f;
 static Sprite *test_sprite = NULL;
 
 Game *game_create(void){
@@ -57,16 +57,16 @@ void game_update(Game *game){
     }
 
     if (game->commands.move_left.active) {
-        test_x -= 0.05f;
+        test_x -= speed * game->delta_time;
     }
     if (game->commands.move_right.active) {
-        test_x += 0.05f;
+        test_x += speed * game->delta_time;
     }
     if (game->commands.move_up.active) {
-        test_y -= 0.05f;
+        test_y -= speed * game->delta_time;
     }
     if (game->commands.move_down.active) {
-        test_y += 0.05f;
+        test_y += speed * game->delta_time;
     }
 
     if(test_x >= SCREEN_WIDTH) test_x = 0.0f;
