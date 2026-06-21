@@ -1,4 +1,5 @@
 #include "test_commands.h"
+#include "../../src/input/commands.h"
 #include <stdio.h>
 #include <windows.h>
 #include <assert.h>

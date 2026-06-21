@@ -76,6 +76,36 @@ Sprite *sprite_create(char *path){
     return sprite;
 }
 
+Sprite *sprite_create_blank(int width, int height){
+    if(width <=0 || height <=0){
+        fprintf(stderr, "Error: Invalid dimensions.\n");
+        return NULL;
+    }
+
+    Sprite *sprite = (Sprite*) malloc(sizeof(Sprite));
+    if(sprite == NULL){
+        fprintf(stderr, "Error: memory allocation failed.\n");
+        return NULL;
+    }
+
+    sprite->height = height;
+    sprite->width = width;
+    size_t size = (size_t)width * (size_t)height;
+    
+    sprite->pixels = (char*) malloc(size * sizeof(char));
+    if(sprite->pixels == NULL){
+        fprintf(stderr, "Error: memory allocation failed for pixels\n");
+        free(sprite);
+        return NULL;
+    }
+
+    for (int i = 0; i < size; i++) {
+        sprite->pixels[i] = BLANK_CHARACTER;
+    }
+
+    return sprite;
+}
+
 void sprite_destroy(Sprite *sprite){
     if(sprite != NULL){
         free(sprite->pixels);
