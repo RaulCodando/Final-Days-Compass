@@ -6,10 +6,12 @@
 typedef enum TileIDs{
     BLANK_TILE,
     TEST_TILE01,
+    TEST_TILE02,
+    TEST_TILE03,
     TILE_COUNT
 } TileIDs;
 
-typedef struct {
+typedef struct TileSet{
     Sprite *sprites[TILE_COUNT];
 } TileSet;
 

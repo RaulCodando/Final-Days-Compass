@@ -51,4 +51,5 @@ void test_game(void){
     test_game_draw();
     test_game_loop();
     test_game_run();
+    system("cls");
 }
