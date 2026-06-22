@@ -8,6 +8,7 @@ typedef struct Sprite{
 } Sprite;
 
 Sprite *sprite_create(char *path);
+Sprite *sprite_create_blank(int width, int height);
 void sprite_destroy(Sprite *sprite);
 
 #endif /* SPRITE_H */
