@@ -3,6 +3,7 @@
 #include "core/test_game.h"
 #include "input/test_keyboard.h"
 #include "input/test_commands.h"
+#include "world/test_tiles.h"
 #include "world/test_map.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,6 +20,8 @@ void ask_for_permission(){
 
 int main(){
     test_sprite();
+    ask_for_permission();
+    test_tileset();
     ask_for_permission();
     test_map();
     ask_for_permission();
