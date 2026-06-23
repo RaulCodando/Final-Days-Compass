@@ -1,6 +1,7 @@
 #include "game.h"
-#include "settings.h"
 #include "../graphics/sprite.h"
+#include "../world/map.h"
+#include "settings.h"
 #include <stdlib.h>
 
 //Test variables
@@ -9,6 +10,7 @@ static float test_y = 0.0f;
 static float speed = 10.0f;
 static float accumulator = 0.0f;
 static Sprite *test_sprite = NULL;
+static Map *test_map = NULL;
 
 Game *game_create(void){
     Game *game = (Game*) malloc(sizeof(Game));
@@ -23,6 +25,14 @@ Game *game_create(void){
     test_sprite = sprite_create("tests/assets/test_sprite03.txt");
     if(test_sprite == NULL){
         renderer_destroy(game->renderer);
+        free(game);
+        return NULL;
+    }
+
+    test_map = map_create_from_file("tests/assets/test_tile_map03.txt", 8);
+    if(test_map == NULL){
+        renderer_destroy(game->renderer);
+        sprite_destroy(test_sprite);
         free(game);
         return NULL;
     }
@@ -43,6 +53,10 @@ void game_destroy(Game *game){
 
     if (test_sprite != NULL) {
         sprite_destroy(test_sprite);
+    }
+
+    if (test_map != NULL) {
+        map_destroy(test_map);
     }
     
     renderer_destroy(game->renderer);
@@ -78,6 +92,10 @@ void game_update(Game *game){
 
 void game_draw(Game *game){
     renderer_clear(game->renderer);
+
+    if (test_map != NULL) {
+        renderer_draw_map(game->renderer, 0, 0, test_map);
+    }
 
     if (test_sprite != NULL) {
         renderer_draw(game->renderer, (int)test_x, (int)test_y, test_sprite);
