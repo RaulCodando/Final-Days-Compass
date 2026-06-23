@@ -32,5 +32,8 @@ int main(){
     test_commands();
     ask_for_permission();
     test_game();
+
+    system("cls");
+    printf("All tests completed successfully.\n");
     return 0;
 }

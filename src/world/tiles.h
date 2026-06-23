@@ -8,6 +8,7 @@ typedef enum TileIDs{
     TEST_TILE01,
     TEST_TILE02,
     TEST_TILE03,
+    TEST_TILE04,
     TILE_COUNT
 } TileIDs;
 

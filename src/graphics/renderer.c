@@ -6,6 +6,9 @@
 #include <stdio.h>
 #include <windows.h>
 
+#define MAX(a,b) (((a)>(b))?(a):(b))
+#define MIN(a,b) (((a)<(b))?(a):(b))
+
 Renderer *renderer_create(int width, int height){
     Renderer *renderer = (Renderer*) malloc(sizeof(Renderer));
 
@@ -37,6 +40,8 @@ void renderer_clear(Renderer *renderer){
 }
 
 void renderer_draw(Renderer *renderer, int x, int y, struct Sprite *sprite){
+    if(!sprite || !renderer) return;
+
     for(int i = 0; i < sprite->height; i++){
         for(int j = 0; j < sprite->width; j++){
             int target_x = x + j;
@@ -54,14 +59,33 @@ void renderer_draw(Renderer *renderer, int x, int y, struct Sprite *sprite){
 }
 
 void renderer_draw_tile(Renderer *renderer, int x, int y, enum TileIDs id, struct TileSet *tileset){
+    if(!tileset || !renderer) return;
+
     Sprite *sprite = tileset_get_sprite(tileset, id);
     if (!sprite) return;
     renderer_draw(renderer, x, y, sprite);
 }
 
 void renderer_draw_map(Renderer *renderer, int x, int y, struct Map *map){
-    for(int i = 0; i < map->height; i++){
-        for(int j = 0; j < map->width; j++){
+    if(!map || !renderer) return;
+
+    int start_j = (x < 0) ? (-x / map->tile_size) : 0;
+    int start_i = (y < 0) ? (-y / map->tile_size) : 0;
+
+    start_j = MAX(0, start_j);
+    start_i = MAX(0, start_i);
+
+    int tiles_in_viewport_x = (renderer->viewport_width - x + map->tile_size - 1) / map->tile_size;
+    int tiles_in_viewport_y = (renderer->viewport_height - y + map->tile_size - 1) / map->tile_size;
+
+    int end_j = start_j + tiles_in_viewport_x;
+    int end_i = start_i + tiles_in_viewport_y;
+
+    end_j = MIN(map->width, end_j);
+    end_i = MIN(map->height, end_i);
+
+    for(int i = start_i; i < end_i; i++){
+        for(int j = start_j; j < end_j; j++){
             int target_x = x + j * map->tile_size;
             int target_y = y + i * map->tile_size;
             TileIDs current_tile = map_get_tile_id(map, j, i);
