@@ -11,9 +11,16 @@ Map *map_create(int width, int height, int tile_size) {
     map->width = width;
     map->height = height;
     map->tile_size = tile_size;
-    
+
+    map->tileset = tileset_create(tile_size, tile_size);
+    if (!map->tileset) {
+        free(map);
+        return NULL;
+    }
+
     map->tile_ids = (int*) malloc(width * height * sizeof(int));
     if (!map->tile_ids) {
+        tileset_destroy(map->tileset);
         free(map);
         return NULL;
     }
@@ -27,9 +34,8 @@ Map *map_create(int width, int height, int tile_size) {
 
 void map_destroy(Map *map) {
     if (!map) return;
-    if (map->tile_ids) {
-        free(map->tile_ids);
-    }
+    if (map->tile_ids) free(map->tile_ids);
+    if (map->tileset) tileset_destroy(map->tileset);
     free(map);
 }
 

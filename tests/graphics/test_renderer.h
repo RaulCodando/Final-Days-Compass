@@ -4,6 +4,8 @@
 void test_renderer_create();
 void test_renderer_clear();
 void test_renderer_draw();
+void test_renderer_draw_tile();
+void test_renderer_draw_map();
 void test_renderer_present();
 void test_renderer();
 

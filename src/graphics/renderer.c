@@ -1,5 +1,6 @@
 #include "renderer.h"
 #include "sprite.h"
+#include "../world/map.h"
 #include "../core/settings.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -48,6 +49,23 @@ void renderer_draw(Renderer *renderer, int x, int y, struct Sprite *sprite){
                     renderer->buffer[index].Char.AsciiChar = pixel_char;
                 }
             }
+        }
+    }
+}
+
+void renderer_draw_tile(Renderer *renderer, int x, int y, enum TileIDs id, struct TileSet *tileset){
+    Sprite *sprite = tileset_get_sprite(tileset, id);
+    if (!sprite) return;
+    renderer_draw(renderer, x, y, sprite);
+}
+
+void renderer_draw_map(Renderer *renderer, int x, int y, struct Map *map){
+    for(int i = 0; i < map->height; i++){
+        for(int j = 0; j < map->width; j++){
+            int target_x = x + j * map->tile_size;
+            int target_y = y + i * map->tile_size;
+            TileIDs current_tile = map_get_tile_id(map, j, i);
+            renderer_draw_tile(renderer, target_x, target_y, current_tile, map->tileset);
         }
     }
 }

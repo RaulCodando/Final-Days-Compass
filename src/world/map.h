@@ -9,6 +9,7 @@ typedef struct Map {
     int height;
     int tile_size;
     int *tile_ids;
+    TileSet *tileset;
 } Map;
 
 Map *map_create(int width, int height, int tile_size);

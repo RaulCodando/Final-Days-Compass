@@ -14,14 +14,8 @@ typedef struct {
 MapPixelBuffer* create_map_pixel_buffer(Map *map){
     if (!map) return NULL;
 
-    TileSet *tileset = tileset_create(8, 8);
-    if (!tileset) return NULL;
-
     MapPixelBuffer *map_pixel_buffer = malloc(sizeof(MapPixelBuffer));
-    if(!map_pixel_buffer) {
-        tileset_destroy(tileset);
-        return NULL;
-    }
+    if(!map_pixel_buffer) return NULL;
 
     map_pixel_buffer->height = map->height * map->tile_size;
     map_pixel_buffer->width = map->width * map->tile_size;
@@ -29,13 +23,12 @@ MapPixelBuffer* create_map_pixel_buffer(Map *map){
     
     if(!map_pixel_buffer->pixels) {
         free(map_pixel_buffer);
-        tileset_destroy(tileset);
         return NULL;
     }
 
     for(int i = 0; i < map->height; i++){
         for(int j = 0; j < map->width; j++){
-            Sprite *current_tile = tileset_get_sprite(tileset, map_get_tile_id(map, j, i));
+            Sprite *current_tile = tileset_get_sprite(map->tileset, map_get_tile_id(map, j, i));
             
             for(int pi = 0; pi < map->tile_size; pi++){
                 for(int pj = 0; pj < map->tile_size; pj++){
@@ -52,8 +45,6 @@ MapPixelBuffer* create_map_pixel_buffer(Map *map){
             }
         }
     }
-    
-    tileset_destroy(tileset);
     
     return map_pixel_buffer;
 }
