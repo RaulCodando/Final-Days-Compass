@@ -13,6 +13,7 @@ TileSet *tileset_create(int width, int height){
     tileset->sprites[1] = sprite_create("tests/assets/test_tile_sprite01.txt");
     tileset->sprites[2] = sprite_create("tests/assets/test_tile_sprite02.txt");
     tileset->sprites[3] = sprite_create("tests/assets/test_tile_sprite03.txt");
+    tileset->sprites[4] = sprite_create("tests/assets/test_tile_sprite04.txt");
 
     for(int i = 0; i < TILE_COUNT; i++) {
         if(!tileset->sprites[i]){

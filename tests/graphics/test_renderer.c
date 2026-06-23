@@ -130,13 +130,17 @@ void test_renderer(){
     test_renderer_clear();
     test_renderer_draw_map();
 
-    printf("Proceeding to present in 5 seconds...\n");
-    Sleep(5000);
+    printf("\nMap drawing test completed. Proceed to the next test? (y/n): ");
+    char response;
+    scanf(" %c", &response);
+    if(response != 'y' && response != 'Y'){
+        exit(0);
+    }
     system("cls");
     test_renderer_present();
 
-    printf("End of tests in 5 seconds...\n");
-    Sleep(5000);
+    printf("End of tests in 2 seconds...\n");
+    Sleep(2000);
     system("cls");
 
     printf("All renderer tests passed.\n");
