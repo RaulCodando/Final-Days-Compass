@@ -1,5 +1,4 @@
 #include "game_object.h"
-#include "../memory/safe_memory.h"
 
 void game_object_init(GameObject *game_object, ObjectIDs id, Sprite *sprite){
     if(!game_object || id >= OBJECT_COUNT || !sprite) return;
