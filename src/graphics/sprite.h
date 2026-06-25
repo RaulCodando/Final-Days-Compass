@@ -7,7 +7,7 @@ typedef struct Sprite{
     char *pixels;
 } Sprite;
 
-Sprite *sprite_create(char *path);
+Sprite *sprite_create(const char *path);
 Sprite *sprite_create_blank(int width, int height);
 void sprite_destroy(Sprite *sprite);
 
