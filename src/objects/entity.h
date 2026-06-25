@@ -13,7 +13,7 @@ typedef struct Entity {
     float y_pos;
 } Entity;
 
-void entity_init(Entity *entity, ObjectIDs id, Sprite *sprite, int health, int standard_attack, float speed, float x_pos, float y_pos);
+Entity *entity_create(ObjectIDs id, Sprite *sprite, int health, int standard_attack, float speed, float x_pos, float y_pos);
 void entity_destroy(Entity *entity);
 
 #endif //ENTITY_H

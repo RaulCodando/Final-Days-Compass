@@ -1,16 +1,8 @@
 #include "../../src/graphics/sprite.h"
 #include "test_sprite.h"
+#include "../utils/utils.h"
 #include <stdio.h>
 #include <assert.h>
-
-void print_sprite(Sprite *sprite){
-    for(int i = 0; i < sprite->height; i++){
-        for(int j = 0; j < sprite->width; j++){
-            printf("%c", sprite->pixels[i * sprite->width + j]);
-        }
-        printf("\n");
-    }
-}
 
 void test_sprite_create_blank(){
     Sprite *sprite = sprite_create_blank(7, 7);

@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "../core/settings.h"
 
-Sprite *sprite_create(char *path){
+Sprite *sprite_create(const char *path){
     FILE *file = fopen(path, "rb");
     if (file == NULL){
         fprintf(stderr, "Error: Could not open file %s\n", path);

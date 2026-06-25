@@ -3,6 +3,7 @@
 
 #include "../graphics/renderer.h"
 #include "../input/commands.h"
+#include "../objects/asset_manager.h"
 #include "../input/keyboard.h"
 #include <stdbool.h>
 #include <windows.h>
@@ -10,6 +11,7 @@
 typedef struct Game{
     bool is_running;
     Renderer *renderer;
+    AssetManager *asset_manager;
     InputKeyboardState keyboard;
     Commands commands;
     LARGE_INTEGER frequency;

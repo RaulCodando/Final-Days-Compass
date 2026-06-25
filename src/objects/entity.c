@@ -1,4 +1,5 @@
 #include "entity.h"
+#include <stdlib.h>
 
 Entity* entity_create(ObjectIDs id, Sprite *sprite, int health, int standard_attack, float speed, float x_pos, float y_pos){
     Entity *entity = (Entity *) malloc(sizeof(Entity));

@@ -4,6 +4,9 @@
 #include "input/test_keyboard.h"
 #include "input/test_commands.h"
 #include "world/test_tiles.h"
+#include "objects/test_game_object.h"
+#include "objects/test_entity.h"
+#include "objects/test_asset_manager.h"
 #include "world/test_map.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,6 +33,12 @@ int main(){
     test_keyboard();
     ask_for_permission();
     test_commands();
+    ask_for_permission();
+    test_game_object_init();
+    ask_for_permission();
+    test_entity_create();
+    ask_for_permission();
+    test_asset_manager();
     ask_for_permission();
     test_game();
 

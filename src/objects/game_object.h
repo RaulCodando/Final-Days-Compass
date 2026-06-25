@@ -4,7 +4,7 @@
 #include "../graphics/sprite.h"
 
 typedef enum ObjectIDs{
-    PLAYER = 0,
+    PLAYER,
     OBJECT_COUNT
 } ObjectIDs;
 

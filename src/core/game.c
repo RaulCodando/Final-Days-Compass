@@ -1,15 +1,13 @@
 #include "game.h"
 #include "../graphics/sprite.h"
+#include "../objects/asset_manager.h"
+#include "../objects/entity.h"
 #include "../world/map.h"
 #include "settings.h"
 #include <stdlib.h>
 
-//Test variables
-static float test_x = 0.0f;
-static float test_y = 0.0f;
-static float speed = 10.0f;
 static float accumulator = 0.0f;
-static Sprite *test_sprite = NULL;
+static Entity *player = NULL;
 static Map *test_map = NULL;
 
 Game *game_create(void){
@@ -22,9 +20,26 @@ Game *game_create(void){
         return NULL;
     }
 
-    test_sprite = sprite_create("tests/assets/test_sprite03.txt");
-    if(test_sprite == NULL){
+    game->asset_manager = asset_manager_create();
+    if(game->asset_manager == NULL){
         renderer_destroy(game->renderer);
+        free(game);
+        return NULL;
+    }
+
+    Sprite *player_sprite = asset_manager_get(game->asset_manager, PLAYER, "tests/assets/test_player_sprite.txt");
+    if(player_sprite == NULL){
+        renderer_destroy(game->renderer);
+        asset_manager_destroy(game->asset_manager);
+        free(game);
+        return NULL;
+    }
+
+    // Cria a entidade player (usando posição 0,0 e velocidade 10.0f para o teste)
+    player = entity_create(PLAYER, player_sprite, 20, 1, 10.0f, 0.0f, 0.0f);
+    if(player == NULL){
+        renderer_destroy(game->renderer);
+        asset_manager_destroy(game->asset_manager); // O manager limpa o sprite automaticamente
         free(game);
         return NULL;
     }
@@ -32,7 +47,8 @@ Game *game_create(void){
     test_map = map_create_from_file("tests/assets/test_tile_map03.txt", 8);
     if(test_map == NULL){
         renderer_destroy(game->renderer);
-        sprite_destroy(test_sprite);
+        asset_manager_destroy(game->asset_manager);
+        entity_destroy(player);
         free(game);
         return NULL;
     }
@@ -51,12 +67,16 @@ Game *game_create(void){
 void game_destroy(Game *game){
     if(game == NULL) return;
 
-    if (test_sprite != NULL) {
-        sprite_destroy(test_sprite);
+    if (player != NULL) {
+        entity_destroy(player);
     }
 
     if (test_map != NULL) {
         map_destroy(test_map);
+    }
+    
+    if (game->asset_manager != NULL) {
+        asset_manager_destroy(game->asset_manager);
     }
     
     renderer_destroy(game->renderer);
@@ -64,7 +84,7 @@ void game_destroy(Game *game){
 }
 
 void game_update(Game *game){
-    if(!game) return;
+    if(!game || !player) return;
 
     if (game->commands.quit_game.active) {
         game->is_running = false;
@@ -72,34 +92,34 @@ void game_update(Game *game){
     }
 
     if (game->commands.move_left.active) {
-        test_x -= 2 * speed * game->delta_time;
+        player->x_pos -= 2 * player->speed * game->delta_time;
     }
     if (game->commands.move_right.active) {
-        test_x += 2 * speed * game->delta_time;
+        player->x_pos += 2 * player->speed * game->delta_time;
     }
     if (game->commands.move_up.active) {
-        test_y -= speed * game->delta_time;
+        player->y_pos -= player->speed * game->delta_time;
     }
     if (game->commands.move_down.active) {
-        test_y += speed * game->delta_time;
+        player->y_pos += player->speed * game->delta_time;
     }
 
-    if(test_x >= SCREEN_WIDTH) test_x = 0.0f;
-    if(test_x < 0) test_x = SCREEN_WIDTH - 1.0f;
-    if(test_y >= SCREEN_HEIGHT) test_y = 0.0f;
-    if(test_y < 0) test_y = SCREEN_HEIGHT - 1.0f;
+    if(player->x_pos >= SCREEN_WIDTH) player->x_pos = 0.0f - player->base.sprite->width;
+    if(player->x_pos + player->base.sprite->width < 0) player->x_pos = SCREEN_WIDTH - 1.0f;
+    if(player->y_pos >= SCREEN_HEIGHT) player->y_pos = 0.0f - player->base.sprite->height;
+    if(player->y_pos + player->base.sprite->height < 0) player->y_pos = SCREEN_HEIGHT - 1.0f;
 }
 
 void game_draw(Game *game){
+    if(!game || !player) return;
+
     renderer_clear(game->renderer);
 
     if (test_map != NULL) {
         renderer_draw_map(game->renderer, 0, 0, test_map);
     }
 
-    if (test_sprite != NULL) {
-        renderer_draw(game->renderer, (int)test_x, (int)test_y, test_sprite);
-    }
+    renderer_draw(game->renderer, (int)player->x_pos, (int)player->y_pos, player->base.sprite);
 
     renderer_present(game->renderer);
 }
