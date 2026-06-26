@@ -3,6 +3,7 @@
 #include "../../src/graphics/sprite.h"
 #include "../../src/world/map.h"
 #include "../../src/core/settings.h"
+#include "../../src/graphics/camera.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -62,12 +63,14 @@ void test_renderer_draw_tile(){
 
 void test_renderer_draw_map(){
     Renderer *renderer = renderer_create(16, 16);
+    Camera *camera = camera_create(0.0f, 0.0f, 0.25f, 16, 16);
     Map *map = map_create_from_file("tests/assets/test_tile_map02.txt", 4);
 
     assert(renderer != NULL);
+    assert(camera != NULL);
     assert(map != NULL);
 
-    renderer_draw_map(renderer, 0, 0, map);
+    renderer_draw_map(renderer, camera, map);
 
     for(int i = 0; i < 16; i++){
         for(int j = 0; j < 16; j++){
@@ -77,6 +80,7 @@ void test_renderer_draw_map(){
     }
 
     renderer_destroy(renderer);
+    camera_destroy(camera);
     map_destroy(map);
 
     printf("test_renderer_draw_map passed.\n");
