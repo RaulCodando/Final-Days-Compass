@@ -8,6 +8,7 @@
 #include "objects/test_entity.h"
 #include "objects/test_asset_manager.h"
 #include "world/test_map.h"
+#include "graphics/test_camera.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -27,6 +28,8 @@ int main(){
     test_tileset();
     ask_for_permission();
     test_map();
+    ask_for_permission();
+    test_camera();
     ask_for_permission();
     test_renderer();
     ask_for_permission();

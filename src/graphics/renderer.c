@@ -2,6 +2,7 @@
 #include "sprite.h"
 #include "../world/map.h"
 #include "../core/settings.h"
+#include "camera.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <windows.h>
@@ -66,28 +67,29 @@ void renderer_draw_tile(Renderer *renderer, int x, int y, enum TileIDs id, struc
     renderer_draw(renderer, x, y, sprite);
 }
 
-void renderer_draw_map(Renderer *renderer, int x, int y, struct Map *map){
-    if(!map || !renderer) return;
+void renderer_draw_map(Renderer *renderer, struct Camera *camera, struct Map *map){
+    if(!map || !renderer || !camera) return;
 
-    int start_j = (x < 0) ? (-x / map->tile_size) : 0;
-    int start_i = (y < 0) ? (-y / map->tile_size) : 0;
+    int start_j = (int)(camera->x) / map->tile_size;
+    int start_i = (int)(camera->y) / map->tile_size;
 
     start_j = MAX(0, start_j);
     start_i = MAX(0, start_i);
 
-    int tiles_in_viewport_x = (renderer->viewport_width - x + map->tile_size - 1) / map->tile_size;
-    int tiles_in_viewport_y = (renderer->viewport_height - y + map->tile_size - 1) / map->tile_size;
+    int tiles_in_viewport_x = (renderer->viewport_width + map->tile_size - 1) / map->tile_size;
+    int tiles_in_viewport_y = (renderer->viewport_height + map->tile_size - 1) / map->tile_size;
 
-    int end_j = start_j + tiles_in_viewport_x;
-    int end_i = start_i + tiles_in_viewport_y;
+    int end_j = start_j + tiles_in_viewport_x + 1;
+    int end_i = start_i + tiles_in_viewport_y + 1;
 
     end_j = MIN(map->width, end_j);
     end_i = MIN(map->height, end_i);
 
     for(int i = start_i; i < end_i; i++){
         for(int j = start_j; j < end_j; j++){
-            int target_x = x + j * map->tile_size;
-            int target_y = y + i * map->tile_size;
+            int target_x = (j * map->tile_size) - (int)camera->x;
+            int target_y = (i * map->tile_size) - (int)camera->y;
+
             TileIDs current_tile = map_get_tile_id(map, j, i);
             renderer_draw_tile(renderer, target_x, target_y, current_tile, map->tileset);
         }

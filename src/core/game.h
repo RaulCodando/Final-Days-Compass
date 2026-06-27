@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include "../graphics/renderer.h"
+#include "../graphics/camera.h"
 #include "../input/commands.h"
 #include "../objects/asset_manager.h"
 #include "../input/keyboard.h"
@@ -11,6 +12,7 @@
 typedef struct Game{
     bool is_running;
     Renderer *renderer;
+    Camera *camera;
     AssetManager *asset_manager;
     InputKeyboardState keyboard;
     Commands commands;
