@@ -3,12 +3,15 @@
 #include "../objects/asset_manager.h"
 #include "../objects/entity.h"
 #include "../world/map.h"
+#include "../physics/collision.h"
 #include "settings.h"
 #include <stdlib.h>
 
 static float accumulator = 0.0f;
 static Entity *player = NULL;
 static Map *test_map = NULL;
+static SolidTileIDs solid_tile_ids;
+static char ids[] = {(char) 5};
 
 Game *game_create(void){
     Game *game = (Game*) malloc(sizeof(Game));
@@ -53,12 +56,26 @@ Game *game_create(void){
         return NULL;
     }
 
+    solid_tile_ids_init(&solid_tile_ids, ids, 1);
+
+    entity_init_collider(player, 2.0f, 8.0f, 4.0f, 0.0f);
+    if(player->collider == NULL){
+        camera_destroy(game->camera);
+        renderer_destroy(game->renderer);
+        asset_manager_destroy(game->asset_manager);
+        entity_destroy(player);
+        solid_tile_ids_destroy(&solid_tile_ids);
+        free(game);
+        return NULL;
+    }
+
     test_map = map_create_from_file("tests/assets/test_tile_map03.txt", 8);
     if(test_map == NULL){
         camera_destroy(game->camera);
         renderer_destroy(game->renderer);
         asset_manager_destroy(game->asset_manager);
         entity_destroy(player);
+        solid_tile_ids_destroy(&solid_tile_ids);
         free(game);
         return NULL;
     }
@@ -79,6 +96,7 @@ void game_destroy(Game *game){
 
     if (player != NULL) entity_destroy(player);
     if (test_map != NULL) map_destroy(test_map);
+    solid_tile_ids_destroy(&solid_tile_ids);
 
     if (game->camera != NULL) camera_destroy(game->camera);
     if (game->asset_manager != NULL) asset_manager_destroy(game->asset_manager);
@@ -95,16 +113,16 @@ void game_update(Game *game){
     }
 
     if (game->commands.move_left.active) {
-        player->x_pos -= 2 * player->speed * game->delta_time;
+        entity_move_and_collide(player, -2.0f * player->speed * game->delta_time, 0.0f, test_map, &solid_tile_ids, NULL, 0);
     }
     if (game->commands.move_right.active) {
-        player->x_pos += 2 * player->speed * game->delta_time;
+        entity_move_and_collide(player, 2.0f * player->speed * game->delta_time, 0.0f, test_map, &solid_tile_ids, NULL, 0);
     }
     if (game->commands.move_up.active) {
-        player->y_pos -= player->speed * game->delta_time;
+        entity_move_and_collide(player, 0.0f, -player->speed * game->delta_time, test_map, &solid_tile_ids, NULL, 0);
     }
     if (game->commands.move_down.active) {
-        player->y_pos += player->speed * game->delta_time;
+        entity_move_and_collide(player, 0.0f, player->speed * game->delta_time, test_map, &solid_tile_ids, NULL, 0);
     }
 
     int map_width_px = test_map->width * test_map->tile_size;

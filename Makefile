@@ -44,6 +44,10 @@ build/asset_manager.o: src/objects/asset_manager.c src/objects/asset_manager.h
 build/camera.o: src/graphics/camera.c src/graphics/camera.h
 	gcc -c src/graphics/camera.c -o build/camera.o -Isrc
 
+# 11.5 Compila a física
+build/collision.o: src/physics/collision.c src/physics/collision.h
+	gcc -c src/physics/collision.c -o build/collision.o -Isrc
+
 # 12. Compila o utils diretamente para a pasta build/
 build/utils.o: tests/utils/utils.c tests/utils/utils.h
 	gcc -c tests/utils/utils.c -o build/utils.o -Isrc -Itests
@@ -59,6 +63,9 @@ build/test_renderer.o: tests/graphics/test_renderer.c tests/graphics/test_render
 # 15. Compila o teste diretamente para a pasta build/
 build/test_camera.o: tests/graphics/test_camera.c tests/graphics/test_camera.h
 	gcc -c tests/graphics/test_camera.c -o build/test_camera.o -Isrc -Itests
+
+build/test_collision.o: tests/physics/test_collision.c tests/physics/test_collision.h
+	gcc -c tests/physics/test_collision.c -o build/test_collision.o -Isrc -Itests
 
 # 16. Compila a main do teste diretamente para a pasta build/
 build/main_test.o: tests/main_test.c
@@ -97,8 +104,8 @@ build/test_asset_manager.o: tests/objects/test_asset_manager.c tests/objects/tes
 	gcc -c tests/objects/test_asset_manager.c -o build/test_asset_manager.o -Isrc -Itests
 
 # 25. Busca os arquivos .o dentro de build/ e gera o executável lá dentro
-test: build/sprite.o build/renderer.o build/test_sprite.o build/test_renderer.o build/main_test.o build/game.o build/test_game.o build/keyboard.o build/test_keyboard.o build/commands.o build/test_commands.o build/map.o build/test_map.o build/tiles.o build/test_tiles.o build/game_object.o build/entity.o build/asset_manager.o build/test_game_object.o build/test_entity.o build/test_asset_manager.o build/utils.o build/camera.o build/test_camera.o
-	gcc -o tests/run_tests build/main_test.o build/test_sprite.o build/sprite.o build/test_renderer.o build/renderer.o build/game.o build/test_game.o build/keyboard.o build/test_keyboard.o build/commands.o build/test_commands.o build/map.o build/test_map.o build/tiles.o build/test_tiles.o build/game_object.o build/entity.o build/asset_manager.o build/test_game_object.o build/test_entity.o build/test_asset_manager.o build/utils.o build/camera.o build/test_camera.o
+test: build/sprite.o build/renderer.o build/test_sprite.o build/test_renderer.o build/main_test.o build/game.o build/test_game.o build/keyboard.o build/test_keyboard.o build/commands.o build/test_commands.o build/map.o build/test_map.o build/tiles.o build/test_tiles.o build/game_object.o build/entity.o build/asset_manager.o build/test_game_object.o build/test_entity.o build/test_asset_manager.o build/utils.o build/camera.o build/test_camera.o build/collision.o build/test_collision.o
+	gcc -o tests/run_tests build/main_test.o build/test_sprite.o build/sprite.o build/test_renderer.o build/renderer.o build/game.o build/test_game.o build/keyboard.o build/test_keyboard.o build/commands.o build/test_commands.o build/map.o build/test_map.o build/tiles.o build/test_tiles.o build/game_object.o build/entity.o build/asset_manager.o build/test_game_object.o build/test_entity.o build/test_asset_manager.o build/utils.o build/camera.o build/test_camera.o build/collision.o build/test_collision.o
 
 # Apaga os arquivos de dentro da build e da pasta tests
 clean:

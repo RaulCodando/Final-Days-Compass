@@ -9,6 +9,7 @@
 #include "objects/test_asset_manager.h"
 #include "world/test_map.h"
 #include "graphics/test_camera.h"
+#include "physics/test_collision.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -39,7 +40,9 @@ int main(){
     ask_for_permission();
     test_game_object_init();
     ask_for_permission();
-    test_entity_create();
+    test_collision();
+    ask_for_permission();
+    test_entity();
     ask_for_permission();
     test_asset_manager();
     ask_for_permission();
