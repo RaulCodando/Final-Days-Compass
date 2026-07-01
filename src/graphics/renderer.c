@@ -3,6 +3,7 @@
 #include "../world/map.h"
 #include "../core/settings.h"
 #include "camera.h"
+#include "../physics/collision.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <windows.h>
@@ -102,6 +103,23 @@ void renderer_present(Renderer *renderer){
     COORD bufferCoord = {0, 0};
     SMALL_RECT writeRegion = {0, 0, (SHORT)(renderer->viewport_width - 1), (SHORT)(renderer->viewport_height - 1)};
     WriteConsoleOutputA(hConsole, renderer->buffer, bufferSize, bufferCoord, &writeRegion);
+}
+
+void renderer_draw_debug_collider(Renderer *renderer, struct Collider *collider, int collider_x, int collider_y){
+    if(!collider || !renderer) return;
+
+    for(int i = 0; i < collider->height; i++){
+        for(int j = 0; j < collider->width; j++){
+            int target_x = collider_x + j;
+            int target_y = collider_y + i;
+
+            if(target_x >= 0 && target_x < renderer->viewport_width && target_y >=0 && target_y < renderer->viewport_height){
+                int index = target_y * renderer->viewport_width + target_x;
+                renderer->buffer[index].Char.AsciiChar = '?';
+                renderer->buffer[index].Attributes = FOREGROUND_RED | FOREGROUND_INTENSITY;
+            }
+        }
+    }
 }
 
 void renderer_destroy(Renderer *renderer){
