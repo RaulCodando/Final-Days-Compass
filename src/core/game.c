@@ -58,7 +58,7 @@ Game *game_create(void){
 
     solid_tile_ids_init(&solid_tile_ids, ids, 1);
 
-    entity_init_collider(player, 2.0f, 8.0f, 4.0f, 0.0f);
+    entity_init_collider(player, 2.0f, 8.0f, 3.0f, 0.0f);
     if(player->collider == NULL){
         camera_destroy(game->camera);
         renderer_destroy(game->renderer);

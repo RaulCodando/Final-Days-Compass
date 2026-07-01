@@ -10,7 +10,7 @@ typedef struct {
     char* solid_tile_ids;
 } SolidTileIDs;
 
-typedef struct {
+typedef struct Collider {
     float x;
     float y;
     float width;
