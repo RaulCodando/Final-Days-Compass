@@ -148,11 +148,8 @@ void game_draw(Game *game){
 
     int player_screen_x = (int) floorf(player->x_pos - game->camera->x);
     int player_screen_y = (int) floorf(player->y_pos - game->camera->y);
-    int collider_screen_x = (int) floorf(player->collider->x - game->camera->x);
-    int collider_screen_y = (int) floorf(player->collider->y - game->camera->y);
 
     renderer_draw(game->renderer, player_screen_x, player_screen_y, player->base.sprite);
-    renderer_draw_debug_collider(game->renderer, player->collider, collider_screen_x, collider_screen_y);
 
     renderer_present(game->renderer);
 }
