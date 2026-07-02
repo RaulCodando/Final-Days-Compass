@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <windows.h>
+#include <math.h>
 
 #define MAX(a,b) (((a)>(b))?(a):(b))
 #define MIN(a,b) (((a)<(b))?(a):(b))
@@ -88,8 +89,8 @@ void renderer_draw_map(Renderer *renderer, struct Camera *camera, struct Map *ma
 
     for(int i = start_i; i < end_i; i++){
         for(int j = start_j; j < end_j; j++){
-            int target_x = (j * map->tile_size) - (int)camera->x;
-            int target_y = (i * map->tile_size) - (int)camera->y;
+            int target_x = (int) floorf((j * map->tile_size) - camera->x);
+            int target_y = (int) floorf((i * map->tile_size) - camera->y);
 
             TileIDs current_tile = map_get_tile_id(map, j, i);
             renderer_draw_tile(renderer, target_x, target_y, current_tile, map->tileset);
