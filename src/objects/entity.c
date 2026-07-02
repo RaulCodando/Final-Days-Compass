@@ -1,5 +1,6 @@
 #include "entity.h"
 #include <stdlib.h>
+#include <math.h>
 
 Entity* entity_create(ObjectIDs id, Sprite *sprite, int health, int standard_attack, float speed, float x_pos, float y_pos){
     Entity *entity = (Entity *) malloc(sizeof(Entity));
@@ -13,6 +14,8 @@ Entity* entity_create(ObjectIDs id, Sprite *sprite, int health, int standard_att
     entity->collider = NULL;
     entity->offset_x = 0.0f;
     entity->offset_y = 0.0f;
+    entity->acc_x = 0.0f;
+    entity->acc_y = 0.0f;
     return entity;
 }
 
@@ -40,8 +43,22 @@ void entity_move_and_collide(Entity* entity, float vel_x, float vel_y, Map* map,
     entity->collider->x = entity->x_pos + entity->offset_x;
     entity->collider->y = entity->y_pos + entity->offset_y;
 
-    float vx = vel_x;
-    float vy = vel_y;
+    if ((vel_x > 0.0f && entity->acc_x < 0.0f) || (vel_x < 0.0f && entity->acc_x > 0.0f)) entity->acc_x = 0.0f;
+    if ((vel_y > 0.0f && entity->acc_y < 0.0f) || (vel_y < 0.0f && entity->acc_y > 0.0f)) entity->acc_y = 0.0f;
+
+    entity->acc_x += vel_x;
+    entity->acc_y += vel_y;
+
+    float move_x = truncf(entity->acc_x);
+    float move_y = truncf(entity->acc_y);
+
+    entity->acc_x -= move_x;
+    entity->acc_y -= move_y;
+
+    if (move_x == 0.0f && move_y == 0.0f) return;
+
+    float vx = move_x;
+    float vy = move_y;
 
     if(vx != 0.0f){
         float zero_y = 0.0f;

@@ -6,6 +6,7 @@
 #include "../physics/collision.h"
 #include "settings.h"
 #include <stdlib.h>
+#include <math.h>
 
 static float accumulator = 0.0f;
 static Entity *player = NULL;
@@ -58,7 +59,7 @@ Game *game_create(void){
 
     solid_tile_ids_init(&solid_tile_ids, ids, 1);
 
-    entity_init_collider(player, 2.0f, 8.0f, 4.0f, 0.0f);
+    entity_init_collider(player, 2.0f, 8.0f, 3.0f, 0.0f);
     if(player->collider == NULL){
         camera_destroy(game->camera);
         renderer_destroy(game->renderer);
@@ -145,10 +146,13 @@ void game_draw(Game *game){
         renderer_draw_map(game->renderer, game->camera, test_map);
     }
 
-    int player_screen_x = (int)(player->x_pos - game->camera->x);
-    int player_screen_y = (int)(player->y_pos - game->camera->y);
+    int player_screen_x = (int) floorf(player->x_pos - game->camera->x);
+    int player_screen_y = (int) floorf(player->y_pos - game->camera->y);
+    int collider_screen_x = (int) floorf(player->collider->x - game->camera->x);
+    int collider_screen_y = (int) floorf(player->collider->y - game->camera->y);
 
     renderer_draw(game->renderer, player_screen_x, player_screen_y, player->base.sprite);
+    renderer_draw_debug_collider(game->renderer, player->collider, collider_screen_x, collider_screen_y);
 
     renderer_present(game->renderer);
 }

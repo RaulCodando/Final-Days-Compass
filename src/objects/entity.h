@@ -17,6 +17,8 @@ typedef struct Entity {
     Collider* collider;
     float offset_x;
     float offset_y;
+    float acc_x;
+    float acc_y;
 } Entity;
 
 Entity *entity_create(ObjectIDs id, Sprite *sprite, int health, int standard_attack, float speed, float x_pos, float y_pos);

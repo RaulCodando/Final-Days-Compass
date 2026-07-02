@@ -9,6 +9,7 @@ struct Map;
 enum TileIDs;
 struct TileSet;
 struct Camera;
+struct Collider;
 
 typedef struct Renderer {
     int viewport_width;
@@ -22,6 +23,7 @@ void renderer_draw(Renderer *renderer, int x, int y, struct Sprite *sprite);
 void renderer_draw_tile(Renderer *renderer, int x, int y, enum TileIDs id, struct TileSet *tileset);
 void renderer_draw_map(Renderer *renderer, struct Camera *camera, struct Map *map);
 void renderer_present(Renderer *renderer);
+void renderer_draw_debug_collider(Renderer *renderer, struct Collider *collider, int collider_x, int collider_y);
 void renderer_destroy(Renderer *renderer);
 
 #endif //RENDERER_H
