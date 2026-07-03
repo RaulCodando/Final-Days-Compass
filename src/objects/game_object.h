@@ -14,6 +14,5 @@ typedef struct GameObject {
 } GameObject;
 
 void game_object_init(GameObject *game_object, ObjectIDs id, Sprite *sprite);
-void game_object_destroy(GameObject *game_object);
 
 #endif //GAME_OBJECT_H

@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <windows.h>
 
 void test_game_create(void){
     Game *game = game_create();
@@ -26,6 +27,7 @@ void test_game_draw(void){
     assert(game != NULL);
     game_draw(game);
     game_destroy(game);
+    system("cls");
     printf("test_game_draw passed.\n");
 }
 
@@ -34,6 +36,7 @@ void test_game_loop(void){
     assert(game != NULL);
     game_loop(game);
     game_destroy(game);
+    system("cls");
     printf("test_game_loop passed.\n");
 }
 
@@ -42,13 +45,37 @@ void test_game_run(void){
     assert(game != NULL);
     game_run(game);
     game_destroy(game);
+    system("cls");
     printf("test_game_run passed.\n");
 }
 
 void test_game(void){
+    char response;
+
     test_game_create();
     test_game_update();
-    test_game_draw();
-    test_game_loop();
-    test_game_run();
+    
+    printf("Do you want to continue with the test_game_draw? (y/n): ");
+    scanf(" %c", &response);
+    fflush(stdout);
+
+    if(response == 'y' || response == 'Y') {
+        test_game_draw();
+    }
+
+    printf("Do you want to continue with the test_game_loop? (y/n): ");
+    scanf(" %c", &response);
+    fflush(stdout);
+
+    if(response == 'y' || response == 'Y') {
+        test_game_loop();
+    }
+
+    printf("Do you want to continue with the test_game_run? (y/n): ");
+    scanf(" %c", &response);
+    fflush(stdout);
+
+    if(response == 'y' || response == 'Y') {
+        test_game_run();
+    }
 }

@@ -1,17 +1,12 @@
 #include "game.h"
 #include "../graphics/sprite.h"
 #include "../objects/asset_manager.h"
-#include "../objects/entity.h"
-#include "../world/map.h"
-#include "../physics/collision.h"
 #include "settings.h"
 #include <stdlib.h>
+#include <stdio.h>
 #include <math.h>
 
 static float accumulator = 0.0f;
-static Entity *player = NULL;
-static Map *test_map = NULL;
-static SolidTileIDs solid_tile_ids;
 static char ids[] = {(char) 5};
 
 Game *game_create(void){
@@ -48,8 +43,8 @@ Game *game_create(void){
         return NULL;
     }
 
-    player = entity_create(PLAYER, player_sprite, 20, 1, 10.0f, 0.0f, 0.0f);
-    if(player == NULL){
+    game->player = entity_create(PLAYER, player_sprite, 20, 1, 10.0f, 0.0f, 0.0f);
+    if(game->player == NULL){
         camera_destroy(game->camera);
         renderer_destroy(game->renderer);
         asset_manager_destroy(game->asset_manager);
@@ -57,26 +52,26 @@ Game *game_create(void){
         return NULL;
     }
 
-    solid_tile_ids_init(&solid_tile_ids, ids, 1);
+    solid_tile_ids_init(&game->solid_tile_ids, ids, 1);
 
-    entity_init_collider(player, 2.0f, 8.0f, 3.0f, 0.0f);
-    if(player->collider == NULL){
+    entity_init_collider(game->player, 2.0f, 8.0f, 3.0f, 0.0f);
+    if(game->player->collider == NULL){
         camera_destroy(game->camera);
         renderer_destroy(game->renderer);
         asset_manager_destroy(game->asset_manager);
-        entity_destroy(player);
-        solid_tile_ids_destroy(&solid_tile_ids);
+        entity_destroy(game->player);
+        solid_tile_ids_destroy(&game->solid_tile_ids);
         free(game);
         return NULL;
     }
 
-    test_map = map_create_from_file("tests/assets/test_tile_map03.txt", 8);
-    if(test_map == NULL){
+    game->map = map_create_from_file("tests/assets/test_tile_map03.txt", 8);
+    if(game->map == NULL){
         camera_destroy(game->camera);
         renderer_destroy(game->renderer);
         asset_manager_destroy(game->asset_manager);
-        entity_destroy(player);
-        solid_tile_ids_destroy(&solid_tile_ids);
+        entity_destroy(game->player);
+        solid_tile_ids_destroy(&game->solid_tile_ids);
         free(game);
         return NULL;
     }
@@ -89,15 +84,16 @@ Game *game_create(void){
     QueryPerformanceFrequency(&game->frequency);
     QueryPerformanceCounter(&game->last_time);
 
+    accumulator = 0.0f;
     return game;
 }
 
 void game_destroy(Game *game){
     if(game == NULL) return;
 
-    if (player != NULL) entity_destroy(player);
-    if (test_map != NULL) map_destroy(test_map);
-    solid_tile_ids_destroy(&solid_tile_ids);
+    if (game->player != NULL) entity_destroy(game->player);
+    if (game->map != NULL) map_destroy(game->map);
+    solid_tile_ids_destroy(&game->solid_tile_ids);
 
     if (game->camera != NULL) camera_destroy(game->camera);
     if (game->asset_manager != NULL) asset_manager_destroy(game->asset_manager);
@@ -106,7 +102,7 @@ void game_destroy(Game *game){
 }
 
 void game_update(Game *game){
-    if(!game || !player) return;
+    if(!game || !game->player) return;
 
     if (game->commands.quit_game.active) {
         game->is_running = false;
@@ -114,42 +110,42 @@ void game_update(Game *game){
     }
 
     if (game->commands.move_left.active) {
-        entity_move_and_collide(player, -2.0f * player->speed * game->delta_time, 0.0f, test_map, &solid_tile_ids, NULL, 0);
+        entity_move_and_collide(game->player, -2.0f * game->player->speed * game->delta_time, 0.0f, game->map, &game->solid_tile_ids, NULL, 0);
     }
     if (game->commands.move_right.active) {
-        entity_move_and_collide(player, 2.0f * player->speed * game->delta_time, 0.0f, test_map, &solid_tile_ids, NULL, 0);
+        entity_move_and_collide(game->player, 2.0f * game->player->speed * game->delta_time, 0.0f, game->map, &game->solid_tile_ids, NULL, 0);
     }
     if (game->commands.move_up.active) {
-        entity_move_and_collide(player, 0.0f, -player->speed * game->delta_time, test_map, &solid_tile_ids, NULL, 0);
+        entity_move_and_collide(game->player, 0.0f, -game->player->speed * game->delta_time, game->map, &game->solid_tile_ids, NULL, 0);
     }
     if (game->commands.move_down.active) {
-        entity_move_and_collide(player, 0.0f, player->speed * game->delta_time, test_map, &solid_tile_ids, NULL, 0);
+        entity_move_and_collide(game->player, 0.0f, game->player->speed * game->delta_time, game->map, &game->solid_tile_ids, NULL, 0);
     }
 
-    int map_width_px = test_map->width * test_map->tile_size;
-    int map_height_px = test_map->height * test_map->tile_size;
+    int map_width_px = game->map->width * game->map->tile_size;
+    int map_height_px = game->map->height * game->map->tile_size;
 
-    if(player->x_pos >= (float)map_width_px) player->x_pos = 0.0f - player->base.sprite->width;
-    if(player->x_pos + player->base.sprite->width < 0) player->x_pos = (float)map_width_px - 1.0f;
-    if(player->y_pos >= (float)map_height_px) player->y_pos = 0.0f - player->base.sprite->height;
-    if(player->y_pos + player->base.sprite->height < 0) player->y_pos = (float)map_height_px - 1.0f;
+    if(game->player->x_pos >= (float)map_width_px) game->player->x_pos = 0.0f - game->player->base.sprite->width;
+    if(game->player->x_pos + game->player->base.sprite->width < 0) game->player->x_pos = (float)map_width_px - 1.0f;
+    if(game->player->y_pos >= (float)map_height_px) game->player->y_pos = 0.0f - game->player->base.sprite->height;
+    if(game->player->y_pos + game->player->base.sprite->height < 0) game->player->y_pos = (float)map_height_px - 1.0f;
 
-    camera_update(game->camera, player->x_pos, player->y_pos, player->base.sprite->width, player->base.sprite->height, map_width_px, map_height_px);
+    camera_update(game->camera, game->player->x_pos, game->player->y_pos, game->player->base.sprite->width, game->player->base.sprite->height, map_width_px, map_height_px);
 }
 
 void game_draw(Game *game){
-    if(!game || !player) return;
+    if(!game || !game->player) return;
 
     renderer_clear(game->renderer);
 
-    if (test_map != NULL) {
-        renderer_draw_map(game->renderer, game->camera, test_map);
+    if (game->map != NULL) {
+        renderer_draw_map(game->renderer, game->camera, game->map);
     }
 
-    int player_screen_x = (int) floorf(player->x_pos - game->camera->x);
-    int player_screen_y = (int) floorf(player->y_pos - game->camera->y);
+    int player_screen_x = (int) floorf(game->player->x_pos - game->camera->x);
+    int player_screen_y = (int) floorf(game->player->y_pos - game->camera->y);
 
-    renderer_draw(game->renderer, player_screen_x, player_screen_y, player->base.sprite);
+    renderer_draw(game->renderer, player_screen_x, player_screen_y, game->player->base.sprite);
 
     renderer_present(game->renderer);
 }
