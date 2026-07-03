@@ -6,16 +6,25 @@
 #include "../input/commands.h"
 #include "../objects/asset_manager.h"
 #include "../input/keyboard.h"
+#include "../objects/entity.h"
+#include "../world/map.h"
+#include "../physics/collision.h"
 #include <stdbool.h>
 #include <windows.h>
 
 typedef struct Game{
     bool is_running;
+
     Renderer *renderer;
     Camera *camera;
     AssetManager *asset_manager;
     InputKeyboardState keyboard;
     Commands commands;
+
+    Entity *player;
+    Map *map;
+    SolidTileIDs solid_tile_ids;
+
     LARGE_INTEGER frequency;
     LARGE_INTEGER last_time;
     float delta_time;

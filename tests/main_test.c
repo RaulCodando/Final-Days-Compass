@@ -12,43 +12,98 @@
 #include "physics/test_collision.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
-void ask_for_permission(){
-    printf("\nTest completed. Proceed to the next test? (y/n): ");
+void choose_test(){
+    printf("Which test do you want to do?: \n");
+    printf("1. Sprite\n");
+    printf("2. Tileset\n");
+    printf("3. Map\n");
+    printf("4. Camera\n");
+    printf("5. Renderer\n");
+    printf("6. Keyboard\n");
+    printf("7. Commands\n");
+    printf("8. Game Object\n");
+    printf("9. Collision\n");
+    printf("10. Entity\n");
+    printf("11. Asset Manager\n");
+    printf("12. Game\n");
+    int choice;
+    scanf(" %d", &choice);
+    system("cls");
+    switch(choice){
+        case 1:
+            test_sprite();
+            break;
+        case 2:
+            test_tileset();
+            break;
+        case 3:
+            test_map();
+            break;
+        case 4:
+            test_camera();
+            break;
+        case 5:
+            test_renderer();
+            break;
+        case 6:
+            test_keyboard();
+            break;
+        case 7:
+            test_commands();
+            break;
+        case 8:
+            test_game_object_init();
+            break;
+        case 9:
+            test_collision();
+            break;
+        case 10:
+            test_entity();
+            break;
+        case 11:
+            test_asset_manager();
+            break;
+        case 12:
+            test_game();
+            break;
+        default:
+            printf("Invalid choice.\n");
+            break;
+    }
+}
+
+bool ask_for_permission(){
+    printf("\nTest completed. Do you wish to do another test? (y/n): ");
     char response;
     scanf(" %c", &response);
+    
     if(response != 'y' && response != 'Y'){
-        exit(0);
+        return false;
     }
+    
     system("cls");
+    return true;
 }
 
 int main(){
-    test_sprite();
-    ask_for_permission();
-    test_tileset();
-    ask_for_permission();
-    test_map();
-    ask_for_permission();
-    test_camera();
-    ask_for_permission();
-    test_renderer();
-    ask_for_permission();
-    test_keyboard();
-    ask_for_permission();
-    test_commands();
-    ask_for_permission();
-    test_game_object_init();
-    ask_for_permission();
-    test_collision();
-    ask_for_permission();
-    test_entity();
-    ask_for_permission();
-    test_asset_manager();
-    ask_for_permission();
-    test_game();
+    bool permission = false;
+    
+    printf("\nDo you wish to start a test? (y/n): ");
+    char response;
+    scanf(" %c", &response);
+    
+    if(response == 'y' || response == 'Y'){
+        permission = true;
+    }
 
-    system("cls");
+    while(permission){
+        choose_test();
+        permission = ask_for_permission();
+        system("cls");
+    }
+
     printf("All tests completed successfully.\n");
     return 0;
 }

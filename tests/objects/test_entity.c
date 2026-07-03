@@ -36,6 +36,7 @@ void test_entity_create(){
     print_entity(entity);
     printf("test_entity_create: PASSED\n");
     entity_destroy(entity);
+    sprite_destroy(sprite);
 }
 
 void test_entity_init_collider(){
@@ -57,6 +58,7 @@ void test_entity_init_collider(){
     print_entity(entity);
     printf("test_entity_init_collider: PASSED\n");
     entity_destroy(entity);
+    sprite_destroy(sprite);
 }
 
 void test_entity_move_and_collide(){
@@ -98,6 +100,7 @@ void test_entity_move_and_collide(){
     print_entity(entity);
     printf("test_entity_move_and_collide: PASSED\n");
     entity_destroy(entity);
+    sprite_destroy(sprite);
     map_destroy(map);
 }
 

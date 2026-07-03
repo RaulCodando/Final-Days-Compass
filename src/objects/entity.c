@@ -86,7 +86,6 @@ void entity_move_and_collide(Entity* entity, float vel_x, float vel_y, Map* map,
 
 void entity_destroy(Entity *entity){
     if(!entity) return;
-    game_object_destroy(&(entity->base));
 
     if(entity->collider){
         collider_destroy(entity->collider);
