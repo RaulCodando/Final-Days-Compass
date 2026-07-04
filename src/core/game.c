@@ -6,95 +6,50 @@
 #include <stdio.h>
 #include <math.h>
 
-static float accumulator = 0.0f;
-static char ids[] = {(char) 5};
-
 Game *game_create(void){
     Game *game = (Game*) malloc(sizeof(Game));
     if(game == NULL) return NULL;
 
-    game->renderer = renderer_create(SCREEN_WIDTH, SCREEN_HEIGHT);
-    if(game->renderer == NULL){
-        free(game);
-        return NULL;
-    }
-
-    game->camera = camera_create(0.0f, 0.0f, 0.25f, SCREEN_WIDTH, SCREEN_HEIGHT);
-    if(game->camera == NULL){
-        renderer_destroy(game->renderer);
-        free(game);
-        return NULL;
-    }
-
-    game->asset_manager = asset_manager_create();
-    if(game->asset_manager == NULL){
-        camera_destroy(game->camera);
-        renderer_destroy(game->renderer);
-        free(game);
-        return NULL;
-    }
-
-    Sprite *player_sprite = asset_manager_get(game->asset_manager, PLAYER, "tests/assets/test_player_sprite.txt");
-    if(player_sprite == NULL){
-        camera_destroy(game->camera);
-        renderer_destroy(game->renderer);
-        asset_manager_destroy(game->asset_manager);
-        free(game);
-        return NULL;
-    }
-
-    game->player = entity_create(PLAYER, player_sprite, 20, 1, 10.0f, 0.0f, 0.0f);
-    if(game->player == NULL){
-        camera_destroy(game->camera);
-        renderer_destroy(game->renderer);
-        asset_manager_destroy(game->asset_manager);
-        free(game);
-        return NULL;
-    }
-
-    solid_tile_ids_init(&game->solid_tile_ids, ids, 1);
-
-    entity_init_collider(game->player, 2.0f, 8.0f, 3.0f, 0.0f);
-    if(game->player->collider == NULL){
-        camera_destroy(game->camera);
-        renderer_destroy(game->renderer);
-        asset_manager_destroy(game->asset_manager);
-        entity_destroy(game->player);
-        solid_tile_ids_destroy(&game->solid_tile_ids);
-        free(game);
-        return NULL;
-    }
-
-    game->map = map_create_from_file("tests/assets/test_tile_map03.txt", 8);
-    if(game->map == NULL){
-        camera_destroy(game->camera);
-        renderer_destroy(game->renderer);
-        asset_manager_destroy(game->asset_manager);
-        entity_destroy(game->player);
-        solid_tile_ids_destroy(&game->solid_tile_ids);
-        free(game);
-        return NULL;
-    }
-
     keyboard_init(&game->keyboard);
     commands_init(&game->commands);
-
-    game->is_running = true;
-
     QueryPerformanceFrequency(&game->frequency);
     QueryPerformanceCounter(&game->last_time);
 
-    accumulator = 0.0f;
+    game->camera = NULL;
+    game->entities = NULL;
+    game->map = NULL;
+    game->renderer = NULL;
+    game->asset_manager = NULL;
+    game->entity_count = 0;
+    game->accumulator = 0.0f;
+    game->is_running = false;
+    
     return game;
+}
+
+void game_init_window(Game *game, float camera_x, float camera_y, float dead_zone_percentage){
+    if(!game) return;
+    
+    game->camera = camera_create(camera_x, camera_y, dead_zone_percentage, SCREEN_WIDTH, SCREEN_HEIGHT);
+    if(game->camera == NULL){ 
+        printf("Failed to create camera\n");
+        return;
+    }
+    
+    game->renderer = renderer_create(SCREEN_WIDTH, SCREEN_HEIGHT);
+    if(game->renderer == NULL){
+        camera_destroy(game->camera);
+        printf("Failed to create renderer\n");
+        return;
+    }
 }
 
 void game_destroy(Game *game){
     if(game == NULL) return;
 
-    if (game->player != NULL) entity_destroy(game->player);
+    if (game->entities != NULL) entity_destroy(game->entities);
     if (game->map != NULL) map_destroy(game->map);
-    solid_tile_ids_destroy(&game->solid_tile_ids);
-
+    if(game->solid_tile_ids.solid_tile_ids->tile_count > 0) solid_tile_ids_destroy(game->solid_tile_ids.solid_tile_ids);
     if (game->camera != NULL) camera_destroy(game->camera);
     if (game->asset_manager != NULL) asset_manager_destroy(game->asset_manager);
     if (game->renderer != NULL) renderer_destroy(game->renderer);
@@ -158,12 +113,12 @@ void game_loop(Game *game){
     float frame_time = (float) elapsed_ticks / (float) game->frequency.QuadPart;
     game->last_time = current_time;
 
-    accumulator += frame_time;
+    game->accumulator += frame_time;
     
-    while (accumulator >= FIXED_TIME_STEP) {
+    while (game->accumulator >= FIXED_TIME_STEP) {
         game->delta_time = FIXED_TIME_STEP;
         game_update(game);
-        accumulator -= FIXED_TIME_STEP;
+        game->accumulator -= FIXED_TIME_STEP;
     }
 
     game_draw(game);
@@ -180,6 +135,9 @@ void game_loop(Game *game){
 
 void game_run(Game *game){
     if(game == NULL) return;
+
+    game->is_running = true;
+
     while(game->is_running){
         keyboard_update(&game->keyboard);
         commands_update(&game->commands, &game->keyboard);
