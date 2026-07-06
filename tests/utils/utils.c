@@ -11,7 +11,7 @@ void print_sprite(Sprite *sprite){
 }
 
 void print_vector(Vector *vector){
-    for(int i = 0; i < vector->size; i++){
+    for(size_t i = 0; i < vector->size; i++){
         printf("%d ", *(int*) vector->data[i]);
     }
     printf("\n");
