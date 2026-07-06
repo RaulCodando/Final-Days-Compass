@@ -99,7 +99,7 @@ Sprite *sprite_create_blank(int width, int height){
         return NULL;
     }
 
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; i++) {
         sprite->pixels[i] = BLANK_CHARACTER;
     }
 
