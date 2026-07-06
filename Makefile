@@ -53,59 +53,71 @@ build/utils.o: tests/utils/utils.c tests/utils/utils.h
 	gcc -c tests/utils/utils.c -o build/utils.o -Isrc -Itests
 
 # 13. Compila o teste diretamente para a pasta build/
-build/test_sprite.o: tests/graphics/test_sprite.c tests/graphics/test_sprite.h
-	gcc -c tests/graphics/test_sprite.c -o build/test_sprite.o -Isrc -Itests
+build/test_sprite.o: tests/graphics_tests/test_sprite.c tests/graphics_tests/test_sprite.h
+	gcc -c tests/graphics_tests/test_sprite.c -o build/test_sprite.o -Isrc -Itests
 
 # 14. Compila o teste diretamente para a pasta build/
-build/test_renderer.o: tests/graphics/test_renderer.c tests/graphics/test_renderer.h
-	gcc -c tests/graphics/test_renderer.c -o build/test_renderer.o -Isrc -Itests
+build/test_renderer.o: tests/graphics_tests/test_renderer.c tests/graphics_tests/test_renderer.h
+	gcc -c tests/graphics_tests/test_renderer.c -o build/test_renderer.o -Isrc -Itests
 
 # 15. Compila o teste diretamente para a pasta build/
-build/test_camera.o: tests/graphics/test_camera.c tests/graphics/test_camera.h
-	gcc -c tests/graphics/test_camera.c -o build/test_camera.o -Isrc -Itests
+build/test_camera.o: tests/graphics_tests/test_camera.c tests/graphics_tests/test_camera.h
+	gcc -c tests/graphics_tests/test_camera.c -o build/test_camera.o -Isrc -Itests
 
-build/test_collision.o: tests/physics/test_collision.c tests/physics/test_collision.h
-	gcc -c tests/physics/test_collision.c -o build/test_collision.o -Isrc -Itests
+build/test_collision.o: tests/physics_tests/test_collision.c tests/physics_tests/test_collision.h
+	gcc -c tests/physics_tests/test_collision.c -o build/test_collision.o -Isrc -Itests
 
 # 16. Compila a main do teste diretamente para a pasta build/
 build/main_test.o: tests/main_test.c
 	gcc -c tests/main_test.c -o build/main_test.o -Isrc -Itests
 
 # 17. Compila o teste diretamente para a pasta build/
-build/test_game.o: tests/core/test_game.c tests/core/test_game.h
-	gcc -c tests/core/test_game.c -o build/test_game.o -Isrc -Itests
+build/test_game.o: tests/core_tests/test_game.c tests/core_tests/test_game.h
+	gcc -c tests/core_tests/test_game.c -o build/test_game.o -Isrc -Itests
 
 # 18. Compila o teste diretamente para a pasta build/
-build/test_keyboard.o: tests/input/test_keyboard.c tests/input/test_keyboard.h
-	gcc -c tests/input/test_keyboard.c -o build/test_keyboard.o -Isrc -Itests
+build/test_keyboard.o: tests/input_tests/test_keyboard.c tests/input_tests/test_keyboard.h
+	gcc -c tests/input_tests/test_keyboard.c -o build/test_keyboard.o -Isrc -Itests
 
 # 19. Compila o teste diretamente para a pasta build/
-build/test_commands.o: tests/input/test_commands.c tests/input/test_commands.h
-	gcc -c tests/input/test_commands.c -o build/test_commands.o -Isrc -Itests
+build/test_commands.o: tests/input_tests/test_commands.c tests/input_tests/test_commands.h
+	gcc -c tests/input_tests/test_commands.c -o build/test_commands.o -Isrc -Itests
 
 # 20. Compila o teste diretamente para a pasta build/
-build/test_map.o: tests/world/test_map.c tests/world/test_map.h
-	gcc -c tests/world/test_map.c -o build/test_map.o -Isrc -Itests
+build/test_map.o: tests/world_tests/test_map.c tests/world_tests/test_map.h
+	gcc -c tests/world_tests/test_map.c -o build/test_map.o -Isrc -Itests
 
 # 21. Compila o teste diretamente para a pasta build/
-build/test_tiles.o: tests/world/test_tiles.c tests/world/test_tiles.h
-	gcc -c tests/world/test_tiles.c -o build/test_tiles.o -Isrc -Itests
+build/test_tiles.o: tests/world_tests/test_tiles.c tests/world_tests/test_tiles.h
+	gcc -c tests/world_tests/test_tiles.c -o build/test_tiles.o -Isrc -Itests
 
 # 22. Compila o teste diretamente para a pasta build/
-build/test_game_object.o: tests/objects/test_game_object.c tests/objects/test_game_object.h
-	gcc -c tests/objects/test_game_object.c -o build/test_game_object.o -Isrc -Itests
+build/test_game_object.o: tests/objects_tests/test_game_object.c tests/objects_tests/test_game_object.h
+	gcc -c tests/objects_tests/test_game_object.c -o build/test_game_object.o -Isrc -Itests
 
 # 23. Compila o teste diretamente para a pasta build/
-build/test_entity.o: tests/objects/test_entity.c tests/objects/test_entity.h
-	gcc -c tests/objects/test_entity.c -o build/test_entity.o -Isrc -Itests
+build/test_entity.o: tests/objects_tests/test_entity.c tests/objects_tests/test_entity.h
+	gcc -c tests/objects_tests/test_entity.c -o build/test_entity.o -Isrc -Itests
 
 # 24. Compila o teste diretamente para a pasta build/
-build/test_asset_manager.o: tests/objects/test_asset_manager.c tests/objects/test_asset_manager.h
-	gcc -c tests/objects/test_asset_manager.c -o build/test_asset_manager.o -Isrc -Itests
+build/test_asset_manager.o: tests/objects_tests/test_asset_manager.c tests/objects_tests/test_asset_manager.h
+	gcc -c tests/objects_tests/test_asset_manager.c -o build/test_asset_manager.o -Isrc -Itests
 
 # 25. Busca os arquivos .o dentro de build/ e gera o executável lá dentro
 test: build/sprite.o build/renderer.o build/test_sprite.o build/test_renderer.o build/main_test.o build/game.o build/test_game.o build/keyboard.o build/test_keyboard.o build/commands.o build/test_commands.o build/map.o build/test_map.o build/tiles.o build/test_tiles.o build/game_object.o build/entity.o build/asset_manager.o build/test_game_object.o build/test_entity.o build/test_asset_manager.o build/utils.o build/camera.o build/test_camera.o build/collision.o build/test_collision.o
 	gcc -o tests/run_tests build/main_test.o build/test_sprite.o build/sprite.o build/test_renderer.o build/renderer.o build/game.o build/test_game.o build/keyboard.o build/test_keyboard.o build/commands.o build/test_commands.o build/map.o build/test_map.o build/tiles.o build/test_tiles.o build/game_object.o build/entity.o build/asset_manager.o build/test_game_object.o build/test_entity.o build/test_asset_manager.o build/utils.o build/camera.o build/test_camera.o build/collision.o build/test_collision.o
+
+# 26. Compila o Vector (Utilitário do Jogo)
+build/vector.o: src/utils/vector.c src/utils/vector.h
+	gcc -c src/utils/vector.c -o build/vector.o -Isrc
+
+# 27. Compila a main do teste de utilitários
+build/utils_test.o: tests/utils_test.c
+	gcc -c tests/utils_test.c -o build/utils_test.o -Isrc -Itests
+
+# Alvo para gerar o executável independente do teste do vetor
+test_utils: build/utils_test.o build/utils.o build/vector.o
+	gcc -o tests/run_utils_tests build/utils_test.o build/utils.o build/vector.o
 
 # Apaga os arquivos de dentro da build e da pasta tests
 clean:
@@ -113,3 +125,5 @@ clean:
 	@if exist build\*.exe del /q build\*.exe
 	@if exist tests\run_tests del /q tests\run_tests
 	@if exist tests\run_tests.exe del /q tests\run_tests.exe
+	@if exist tests\run_utils_tests del /q tests\run_utils_tests
+	@if exist tests\run_utils_tests.exe del /q tests\run_utils_tests.exe

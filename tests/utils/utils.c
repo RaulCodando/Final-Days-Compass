@@ -9,3 +9,10 @@ void print_sprite(Sprite *sprite){
         printf("\n");
     }
 }
+
+void print_vector(Vector *vector){
+    for(int i = 0; i < vector->size; i++){
+        printf("%d ", *(int*) vector->data[i]);
+    }
+    printf("\n");
+}
