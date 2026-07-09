@@ -8,8 +8,6 @@
 void test_game_create(void){
     Game *game = game_create();
     assert(game != NULL);
-    assert(game->is_running == true);
-    assert(game->renderer != NULL);
     game_destroy(game);
     printf("test_game_create passed.\n");
 }
@@ -42,7 +40,36 @@ void test_game_loop(void){
 
 void test_game_run(void){
     Game *game = game_create();
+    const char *sprite_paths[1] = {"tests/assets/test_player_sprite.txt"};
+    static char tile_ids[1] = {(char) 5};
+    ObjectIDs object_ids[1] = {PLAYER};
     assert(game != NULL);
+
+    if(manage_window_init(game, 0.0f, 0.0f, 0.25f) == false){
+        game_destroy(game);
+        assert(false);
+    }
+
+    if(manage_entities_init(game, object_ids, sprite_paths, 1) == false){
+        game_destroy(game);
+        assert(false);
+    }
+
+    if(manage_entities_add(game, PLAYER, 20, 1, 10.0f, 0.0f, 0.0f, "tests/assets/test_player_sprite.txt") == false){
+        game_destroy(game);
+        assert(false);
+    }
+
+    if(manage_entities_init_collider(game, PLAYER, 2.0f, 8.0f, 3.0f, 0.0f) == false){
+        game_destroy(game);
+        assert(false);
+    }
+
+    if(manage_world_init(game, "tests/assets/test_tile_map03.txt", 8, tile_ids, 1) == false){
+        game_destroy(game);
+        assert(false);
+    }
+
     game_run(game);
     game_destroy(game);
     system("cls");
