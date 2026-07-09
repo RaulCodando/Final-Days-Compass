@@ -1,6 +1,9 @@
 #include "game.h"
 #include "../graphics/sprite.h"
 #include "../objects/asset_manager.h"
+#include "managers/window_manager.h"
+#include "managers/entity_manager.h"
+#include "managers/world_manager.h"
 #include "settings.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -27,29 +30,44 @@ Game *game_create(void){
     return game;
 }
 
-void game_init_window(Game *game, float camera_x, float camera_y, float dead_zone_percentage){
-    if(!game) return;
+bool manage_window_init(Game *game, float camera_x, float camera_y, float dead_zone_percentage){
+    if(game == NULL) return false;
     
-    game->camera = camera_create(camera_x, camera_y, dead_zone_percentage, SCREEN_WIDTH, SCREEN_HEIGHT);
-    if(game->camera == NULL){ 
-        printf("Failed to create camera\n");
-        return;
-    }
+    return init_window(&game->camera, &game->renderer, camera_x, camera_y, dead_zone_percentage);
+}
+
+bool manage_entities_init(Game *game, ObjectIDs *object_ids, const char **sprite_paths, int sprite_count){
+    if(game == NULL) return false;
     
-    game->renderer = renderer_create(SCREEN_WIDTH, SCREEN_HEIGHT);
-    if(game->renderer == NULL){
-        camera_destroy(game->camera);
-        printf("Failed to create renderer\n");
-        return;
-    }
+    return init_entities(&game->entities, &game->asset_manager, object_ids, sprite_paths, sprite_count);
+}
+
+bool manage_entities_add(Game *game, ObjectIDs id, int health, int standard_attack, float speed, float x_pos, float y_pos, const char *sprite_path){
+    if(game == NULL) return false;
+    
+    return add_entity(&game->entities, &game->asset_manager, &game->entity_count, id, health, standard_attack, speed, x_pos, y_pos, sprite_path);
+}
+
+bool manage_entities_init_collider(Game *game, ObjectIDs id, float collider_width, float collider_height, float offset_x, float offset_y){
+    if(game == NULL) return false;
+    
+    return init_entity_collider(&game->entities, id, collider_width, collider_height, offset_x, offset_y);
+}
+
+bool manage_world_init(Game *game, const char *map_file, int tile_size, char *tile_ids, int tile_count){
+    if(game == NULL) return false;
+    
+    return init_world(&game->map, &game->solid_tile_ids, map_file, tile_size, tile_ids, tile_count);
 }
 
 void game_destroy(Game *game){
     if(game == NULL) return;
 
-    if (game->entities != NULL) entity_destroy(game->entities);
+    if (game->entities != NULL) vector_destroy(game->entities);
     if (game->map != NULL) map_destroy(game->map);
-    if(game->solid_tile_ids.solid_tile_ids->tile_count > 0) solid_tile_ids_destroy(game->solid_tile_ids.solid_tile_ids);
+
+    solid_tile_ids_destroy(&game->solid_tile_ids);
+
     if (game->camera != NULL) camera_destroy(game->camera);
     if (game->asset_manager != NULL) asset_manager_destroy(game->asset_manager);
     if (game->renderer != NULL) renderer_destroy(game->renderer);
@@ -57,7 +75,18 @@ void game_destroy(Game *game){
 }
 
 void game_update(Game *game){
-    if(!game || !game->player) return;
+    if(!game || !game->entities) return;
+
+    Entity *player = NULL;
+    for (size_t i = 0; i < game->entities->size; i++) {
+        Entity *entity = (Entity *)vector_get(game->entities, i);
+        if(entity->base.id == PLAYER){
+            player = entity;
+            break;
+        }
+    }
+
+    if(player == NULL) return;
 
     if (game->commands.quit_game.active) {
         game->is_running = false;
@@ -65,31 +94,31 @@ void game_update(Game *game){
     }
 
     if (game->commands.move_left.active) {
-        entity_move_and_collide(game->player, -2.0f * game->player->speed * game->delta_time, 0.0f, game->map, &game->solid_tile_ids, NULL, 0);
+        entity_move_and_collide(player, -2.0f * player->speed * game->delta_time, 0.0f, game->map, &game->solid_tile_ids, NULL, 0);
     }
     if (game->commands.move_right.active) {
-        entity_move_and_collide(game->player, 2.0f * game->player->speed * game->delta_time, 0.0f, game->map, &game->solid_tile_ids, NULL, 0);
+        entity_move_and_collide(player, 2.0f * player->speed * game->delta_time, 0.0f, game->map, &game->solid_tile_ids, NULL, 0);
     }
     if (game->commands.move_up.active) {
-        entity_move_and_collide(game->player, 0.0f, -game->player->speed * game->delta_time, game->map, &game->solid_tile_ids, NULL, 0);
+        entity_move_and_collide(player, 0.0f, -player->speed * game->delta_time, game->map, &game->solid_tile_ids, NULL, 0);
     }
     if (game->commands.move_down.active) {
-        entity_move_and_collide(game->player, 0.0f, game->player->speed * game->delta_time, game->map, &game->solid_tile_ids, NULL, 0);
+        entity_move_and_collide(player, 0.0f, player->speed * game->delta_time, game->map, &game->solid_tile_ids, NULL, 0);
     }
 
     int map_width_px = game->map->width * game->map->tile_size;
     int map_height_px = game->map->height * game->map->tile_size;
 
-    if(game->player->x_pos >= (float)map_width_px) game->player->x_pos = 0.0f - game->player->base.sprite->width;
-    if(game->player->x_pos + game->player->base.sprite->width < 0) game->player->x_pos = (float)map_width_px - 1.0f;
-    if(game->player->y_pos >= (float)map_height_px) game->player->y_pos = 0.0f - game->player->base.sprite->height;
-    if(game->player->y_pos + game->player->base.sprite->height < 0) game->player->y_pos = (float)map_height_px - 1.0f;
+    if(player->x_pos >= (float)map_width_px) player->x_pos = 0.0f - player->base.sprite->width;
+    if(player->x_pos + player->base.sprite->width < 0) player->x_pos = (float)map_width_px - 1.0f;
+    if(player->y_pos >= (float)map_height_px) player->y_pos = 0.0f - player->base.sprite->height;
+    if(player->y_pos + player->base.sprite->height < 0) player->y_pos = (float)map_height_px - 1.0f;
 
-    camera_update(game->camera, game->player->x_pos, game->player->y_pos, game->player->base.sprite->width, game->player->base.sprite->height, map_width_px, map_height_px);
+    camera_update(game->camera, player->x_pos, player->y_pos, player->base.sprite->width, player->base.sprite->height, map_width_px, map_height_px);
 }
 
 void game_draw(Game *game){
-    if(!game || !game->player) return;
+    if(!game || !game->entities) return;
 
     renderer_clear(game->renderer);
 
@@ -97,10 +126,15 @@ void game_draw(Game *game){
         renderer_draw_map(game->renderer, game->camera, game->map);
     }
 
-    int player_screen_x = (int) floorf(game->player->x_pos - game->camera->x);
-    int player_screen_y = (int) floorf(game->player->y_pos - game->camera->y);
+    for(size_t i = 0; i < game->entities->size; i++){
+        Entity *entity = (Entity*)vector_get(game->entities, i);
+        if (!entity) continue;
+        
+        int entity_screen_x = (int) floorf(entity->x_pos - game->camera->x);
+        int entity_screen_y = (int) floorf(entity->y_pos - game->camera->y);
 
-    renderer_draw(game->renderer, player_screen_x, player_screen_y, game->player->base.sprite);
+        renderer_draw(game->renderer, entity_screen_x, entity_screen_y, entity->base.sprite);
+    }
 
     renderer_present(game->renderer);
 }
