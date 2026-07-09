@@ -1,6 +1,6 @@
 #include "world_manager.h"
-#include "../../world/map.h"
-#include "../../physics/collision.h"
+#include "../world/map.h"
+#include "../physics/collision.h"
 #include <stdio.h>
 #include <stdlib.h>
 

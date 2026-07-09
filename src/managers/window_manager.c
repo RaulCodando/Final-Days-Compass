@@ -1,7 +1,7 @@
 #include "window_manager.h"
-#include "../../graphics/renderer.h"
-#include "../../graphics/camera.h"
-#include "../settings.h"
+#include "../graphics/renderer.h"
+#include "../graphics/camera.h"
+#include "../core/settings.h"
 #include <stdio.h>
 #include <stdlib.h>
 

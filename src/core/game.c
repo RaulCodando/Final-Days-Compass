@@ -1,9 +1,9 @@
 #include "game.h"
 #include "../graphics/sprite.h"
 #include "../objects/asset_manager.h"
-#include "managers/window_manager.h"
-#include "managers/entity_manager.h"
-#include "managers/world_manager.h"
+#include "../managers/window_manager.h"
+#include "../managers/entity_manager.h"
+#include "../managers/world_manager.h"
 #include "settings.h"
 #include <stdlib.h>
 #include <stdio.h>

@@ -1,8 +1,8 @@
 #include "entity_manager.h"
-#include "../../objects/entity.h"
-#include "../../graphics/sprite.h"
-#include "../../objects/asset_manager.h"
-#include "../../utils/vector.h"
+#include "../objects/entity.h"
+#include "../graphics/sprite.h"
+#include "../objects/asset_manager.h"
+#include "../utils/vector.h"
 #include <stdio.h>
 #include <stdlib.h>
 
