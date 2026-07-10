@@ -5,7 +5,7 @@
 #include "../world/map.h"
 #include <stdbool.h>
 
-typedef struct {
+typedef struct SolidTileIDs {
     int tile_count;
     char* solid_tile_ids;
 } SolidTileIDs;
