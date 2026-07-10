@@ -10,6 +10,9 @@
 #include "world_tests/test_map.h"
 #include "graphics_tests/test_camera.h"
 #include "physics_tests/test_collision.h"
+#include "managers_tests/test_window_manager.h"
+#include "managers_tests/test_entity_manager.h"
+#include "managers_tests/test_world_manager.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -27,7 +30,10 @@ void choose_test(){
     printf("9. Collision\n");
     printf("10. Entity\n");
     printf("11. Asset Manager\n");
-    printf("12. Game\n");
+    printf("12. Window Manager\n");
+    printf("13. Entity Manager\n");
+    printf("14. World Manager\n");
+    printf("15. Game\n");
     int choice;
     scanf(" %d", &choice);
     system("cls");
@@ -66,6 +72,15 @@ void choose_test(){
             test_asset_manager();
             break;
         case 12:
+            test_init_window();
+            break;
+        case 13:
+            test_entity_manager();
+            break;
+        case 14:
+            test_init_world();
+            break;
+        case 15:
             test_game();
             break;
         default:
