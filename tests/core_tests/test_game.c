@@ -12,6 +12,56 @@ void test_game_create(void){
     printf("test_game_create passed.\n");
 }
 
+void test_manage_window_init(void){
+    Game *game = game_create();
+    assert(game != NULL);
+    assert(manage_window_init(game, 0.0f, 0.0f, 0.25f) == true);
+    game_destroy(game);
+    printf("test_manage_window_init passed.\n");
+}
+
+void test_manage_entities_init(void){
+    const char *sprite_paths[1] = {"tests/assets/test_player_sprite.txt"};
+    ObjectIDs object_ids[1] = {PLAYER};
+    Game *game = game_create();
+    assert(game != NULL);
+    assert(manage_entities_init(game, object_ids, sprite_paths, 1) == true);
+    game_destroy(game);
+    printf("test_manage_entities_init passed.\n");
+}
+
+void test_manage_entities_add(void){
+    const char *sprite_paths[1] = {"tests/assets/test_player_sprite.txt"};
+    ObjectIDs object_ids[1] = {PLAYER};
+    Game *game = game_create();
+    assert(game != NULL);
+    assert(manage_entities_init(game, object_ids, sprite_paths, 1) == true);
+    assert(manage_entities_add(game, PLAYER, 20, 1, 10.0f, 0.0f, 0.0f, "tests/assets/test_player_sprite.txt") == true);
+    game_destroy(game);
+    printf("test_manage_entities_add passed.\n");
+}
+
+void test_manage_entities_init_collider(void){
+    const char *sprite_paths[1] = {"tests/assets/test_player_sprite.txt"};
+    ObjectIDs object_ids[1] = {PLAYER};
+    Game *game = game_create();
+    assert(game != NULL);
+    assert(manage_entities_init(game, object_ids, sprite_paths, 1) == true);
+    assert(manage_entities_add(game, PLAYER, 20, 1, 10.0f, 0.0f, 0.0f, "tests/assets/test_player_sprite.txt") == true);
+    assert(manage_entities_init_collider(game, PLAYER, 2.0f, 8.0f, 3.0f, 0.0f) == true);
+    game_destroy(game);
+    printf("test_manage_entities_init_collider passed.\n");
+}
+
+void test_manage_world_init(void){
+    char tile_ids[1] = {(char) 5};
+    Game *game = game_create();
+    assert(game != NULL);
+    assert(manage_world_init(game, "tests/assets/test_tile_map03.txt", 8, tile_ids, 1) == true);
+    game_destroy(game);
+    printf("test_manage_world_init passed.\n");
+}
+
 void test_game_update(void){
     Game *game = game_create();
     assert(game != NULL);
@@ -80,6 +130,11 @@ void test_game(void){
     char response;
 
     test_game_create();
+    test_manage_window_init();
+    test_manage_entities_init();
+    test_manage_entities_add();
+    test_manage_entities_init_collider();
+    test_manage_world_init();
     test_game_update();
     
     printf("Do you want to continue with the test_game_draw? (y/n): ");
