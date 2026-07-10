@@ -23,7 +23,10 @@ Game *game_create(void){
     game->map = NULL;
     game->renderer = NULL;
     game->asset_manager = NULL;
+    game->solid_tile_ids.solid_tile_ids = NULL;
+    game->solid_tile_ids.tile_count = 0;
     game->entity_count = 0;
+    game->delta_time = 0.0f;
     game->accumulator = 0.0f;
     game->is_running = false;
     
@@ -63,7 +66,12 @@ bool manage_world_init(Game *game, const char *map_file, int tile_size, char *ti
 void game_destroy(Game *game){
     if(game == NULL) return;
 
-    if (game->entities != NULL) vector_destroy(game->entities);
+    if (game->entities != NULL) {
+        for(size_t i = 0; i < game->entities->size; i++){
+            entity_destroy((Entity*)vector_get(game->entities, i));
+        }
+        vector_destroy(game->entities);
+    }
     if (game->map != NULL) map_destroy(game->map);
 
     solid_tile_ids_destroy(&game->solid_tile_ids);
