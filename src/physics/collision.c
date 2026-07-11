@@ -1,4 +1,6 @@
 #include "collision.h"
+#include "../objects/entity.h"
+#include "../utils/vector.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -136,6 +138,52 @@ void resolve_custom_collision(Collider* target_collider, float* vel_x, float* ve
                 }
                 else if (*vel_y < 0.0f){
                     target_collider->y = colliders[i].y + colliders[i].height;
+                }
+                *vel_y = 0.0f;
+                break;
+            }
+        }
+    }
+}
+
+void resolve_entity_collision(Entity* target_entity, float* vel_x, float* vel_y, Vector* entities){
+    if(!target_entity || !entities || entities->size <= 0) return;
+
+    Collider* target_collider = target_entity->collider;
+
+    if(*vel_x != 0.0f){
+        target_collider->x += *vel_x;
+        
+        for(size_t i = 0; i < entities->size; i++){
+            Entity* current_entity = (Entity*)vector_get(entities, i);
+            if(current_entity == target_entity || current_entity->collider == NULL) continue;
+
+            if(is_collider_overlapping(target_collider, current_entity->collider)){
+                if(*vel_x > 0.0f){
+                    target_collider->x = current_entity->collider->x - target_collider->width;
+                }
+                else if (*vel_x < 0.0f){
+                    target_collider->x = current_entity->collider->x + current_entity->collider->width;
+                }
+                *vel_x = 0.0f;
+                break;
+            }
+        }
+    }
+
+    if(*vel_y != 0.0f){
+        target_collider->y += *vel_y;
+
+        for(size_t i = 0; i < entities->size; i++){
+            Entity* current_entity = (Entity*)vector_get(entities, i);
+            if(current_entity == target_entity || current_entity->collider == NULL) continue;
+
+            if(is_collider_overlapping(target_collider, current_entity->collider)){
+                if(*vel_y > 0.0f){
+                    target_collider->y = current_entity->collider->y - target_collider->height;
+                }
+                else if (*vel_y < 0.0f){
+                    target_collider->y = current_entity->collider->y + current_entity->collider->height;
                 }
                 *vel_y = 0.0f;
                 break;
