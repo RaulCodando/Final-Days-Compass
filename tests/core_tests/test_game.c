@@ -121,7 +121,7 @@ void test_game_run(void){
         assert(false);
     }
 
-    if(manage_entities_init_collider(game, TEST_ENTITY, 2.0f, 8.0f, 2.0f, 0.0f) == false){
+    if(manage_entities_init_collider(game, TEST_ENTITY, 4.0f, 8.0f, 2.0f, 0.0f) == false){
         game_destroy(game);
         assert(false);
     }
