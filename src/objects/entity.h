@@ -11,6 +11,8 @@ typedef struct Entity {
     int health;
     int standard_attack;
     float speed;
+    float vel_x;
+    float vel_y;
     float x_pos;
     float y_pos;
 
@@ -21,9 +23,11 @@ typedef struct Entity {
     float acc_y;
 } Entity;
 
+typedef struct Vector Vector;
+
 Entity *entity_create(ObjectIDs id, Sprite *sprite, int health, int standard_attack, float speed, float x_pos, float y_pos);
 void entity_init_collider(Entity* entity, float collider_width, float collider_height, float offset_x, float offset_y);
-void entity_move_and_collide(Entity* entity, float vel_x, float vel_y, Map* map, SolidTileIDs* solid_tile_ids, Collider* colliders, int collider_count);
+void entity_move_and_collide(Entity* entity, Map* map, SolidTileIDs* solid_tile_ids, Collider* colliders, int collider_count, Vector* entities);
 void entity_destroy(Entity *entity);
 
 #endif //ENTITY_H
