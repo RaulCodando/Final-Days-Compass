@@ -1,4 +1,6 @@
 #include "test_entity.h"
+#include "../../src/objects/entity.h"
+#include "../../src/utils/vector.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -71,6 +73,8 @@ void test_entity_move_and_collide(){
     Entity* entity = entity_create(PLAYER, sprite, 100, 10, 1.0f, 0.0f, 0.0f);
     assert(entity != NULL);
 
+    Vector* entities = vector_create();
+
     entity_init_collider(entity, 1.0f, 1.0f, 1.0f, 1.0f);
     assert(entity->collider != NULL);
 
@@ -82,10 +86,10 @@ void test_entity_move_and_collide(){
     char tile_ids[] = {1};
     solid_tile_ids_init(&solid_tile_ids, tile_ids, 1);
 
-    float vel_x = entity->speed;
-    float vel_y = entity->speed;
+    entity->vel_x = entity->speed;
+    entity->vel_y = entity->speed;
 
-    entity_move_and_collide(entity, vel_x, vel_y, map, &solid_tile_ids, colliders, 1);
+    entity_move_and_collide(entity, map, &solid_tile_ids, colliders, 1, entities);
     
     ASSERT_FLOAT_EQUAL(entity->x_pos, 0.0f);
     ASSERT_FLOAT_EQUAL(entity->y_pos, 1.0f);
