@@ -32,6 +32,8 @@ typedef struct Game {
     // World
     Map *map;
     SolidTileIDs solid_tile_ids;
+    Collider *custom_colliders;
+    int custom_collider_count;
 
     // Time Settings
     LARGE_INTEGER frequency;
