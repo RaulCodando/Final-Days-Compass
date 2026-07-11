@@ -17,12 +17,16 @@ typedef struct Collider {
     float height;
 } Collider;
 
+typedef struct Entity Entity;
+typedef struct Vector Vector;
+
 Collider* collider_create(float x, float y, float width, float height);
 void solid_tile_ids_init(SolidTileIDs* solid_tile_ids, char* tile_ids, int tile_count);
 bool is_collider_overlapping(Collider* collider_a, Collider* collider_b);
 bool is_tile_solid(TileIDs id, SolidTileIDs* solid_tile_ids);
 void resolve_map_collision(Collider* collider, float* vel_x, float* vel_y, Map* map, SolidTileIDs* solid_tile_ids);
 void resolve_custom_collision(Collider* target_collider, float* vel_x, float* vel_y, Collider* colliders, int collider_count);
+void resolve_entity_collision(Entity* target_entity, float* vel_x, float* vel_y, Vector* entities);
 void collider_destroy(Collider* collider);
 void solid_tile_ids_destroy(SolidTileIDs* solid_tile_ids);
 

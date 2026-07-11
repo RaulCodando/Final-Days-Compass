@@ -5,6 +5,7 @@
 
 typedef enum ObjectIDs{
     PLAYER,
+    TEST_ENTITY,
     OBJECT_COUNT
 } ObjectIDs;
 

@@ -90,9 +90,10 @@ void test_game_loop(void){
 
 void test_game_run(void){
     Game *game = game_create();
-    const char *sprite_paths[1] = {"tests/assets/test_player_sprite.txt"};
+    const char *sprite_paths[2] = {"tests/assets/test_player_sprite.txt", 
+                                   "tests/assets/test_entity_sprite.txt"};
     static char tile_ids[1] = {(char) 5};
-    ObjectIDs object_ids[1] = {PLAYER};
+    ObjectIDs object_ids[2] = {PLAYER, TEST_ENTITY};
     assert(game != NULL);
 
     if(manage_window_init(game, 0.0f, 0.0f, 0.25f) == false){
@@ -100,7 +101,7 @@ void test_game_run(void){
         assert(false);
     }
 
-    if(manage_entities_init(game, object_ids, sprite_paths, 1) == false){
+    if(manage_entities_init(game, object_ids, sprite_paths, 2) == false){
         game_destroy(game);
         assert(false);
     }
@@ -110,7 +111,17 @@ void test_game_run(void){
         assert(false);
     }
 
+    if(manage_entities_add(game, TEST_ENTITY, 20, 1, 10.0f, 16.0f, 0.0f, "tests/assets/test_entity_sprite.txt") == false){
+        game_destroy(game);
+        assert(false);
+    }
+
     if(manage_entities_init_collider(game, PLAYER, 2.0f, 8.0f, 3.0f, 0.0f) == false){
+        game_destroy(game);
+        assert(false);
+    }
+
+    if(manage_entities_init_collider(game, TEST_ENTITY, 4.0f, 8.0f, 2.0f, 0.0f) == false){
         game_destroy(game);
         assert(false);
     }

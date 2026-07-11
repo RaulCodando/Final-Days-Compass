@@ -24,8 +24,10 @@ Game *game_create(void){
     game->renderer = NULL;
     game->asset_manager = NULL;
     game->solid_tile_ids.solid_tile_ids = NULL;
+    game->custom_colliders = NULL;
     game->solid_tile_ids.tile_count = 0;
     game->entity_count = 0;
+    game->custom_collider_count = 0;
     game->delta_time = 0.0f;
     game->accumulator = 0.0f;
     game->is_running = false;
@@ -79,6 +81,7 @@ void game_destroy(Game *game){
     if (game->camera != NULL) camera_destroy(game->camera);
     if (game->asset_manager != NULL) asset_manager_destroy(game->asset_manager);
     if (game->renderer != NULL) renderer_destroy(game->renderer);
+    if (game->custom_colliders != NULL) free(game->custom_colliders);
     free(game);
 }
 
@@ -88,9 +91,11 @@ void game_update(Game *game){
     Entity *player = NULL;
     for (size_t i = 0; i < game->entities->size; i++) {
         Entity *entity = (Entity *)vector_get(game->entities, i);
+        if(entity == NULL) continue;
+        entity->vel_x = 0.0f;
+        entity->vel_y = 0.0f;
         if(entity->base.id == PLAYER){
             player = entity;
-            break;
         }
     }
 
@@ -101,18 +106,12 @@ void game_update(Game *game){
         return;
     }
 
-    if (game->commands.move_left.active) {
-        entity_move_and_collide(player, -2.0f * player->speed * game->delta_time, 0.0f, game->map, &game->solid_tile_ids, NULL, 0);
-    }
-    if (game->commands.move_right.active) {
-        entity_move_and_collide(player, 2.0f * player->speed * game->delta_time, 0.0f, game->map, &game->solid_tile_ids, NULL, 0);
-    }
-    if (game->commands.move_up.active) {
-        entity_move_and_collide(player, 0.0f, -player->speed * game->delta_time, game->map, &game->solid_tile_ids, NULL, 0);
-    }
-    if (game->commands.move_down.active) {
-        entity_move_and_collide(player, 0.0f, player->speed * game->delta_time, game->map, &game->solid_tile_ids, NULL, 0);
-    }
+    if (game->commands.move_left.active) player->vel_x = -2.0f * player->speed * game->delta_time;
+    if (game->commands.move_right.active) player->vel_x = 2.0f * player->speed * game->delta_time;
+    if (game->commands.move_up.active) player->vel_y = -1.0f * player->speed * game->delta_time;
+    if (game->commands.move_down.active) player->vel_y = 1.0f * player->speed * game->delta_time;
+    
+    entity_move_and_collide(player, game->map, &game->solid_tile_ids, game->custom_colliders, game->custom_collider_count, game->entities);
 
     int map_width_px = game->map->width * game->map->tile_size;
     int map_height_px = game->map->height * game->map->tile_size;
