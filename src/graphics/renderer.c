@@ -52,9 +52,13 @@ void renderer_draw(Renderer *renderer, int x, int y, struct Sprite *sprite){
 
             if(target_x >= 0 && target_x < renderer->viewport_width && target_y >=0 && target_y < renderer->viewport_height){
                 char pixel_char = sprite->pixels[i * sprite->width + j];
-                if(pixel_char != BLANK_CHARACTER){
+                if(pixel_char != BLANK_CHARACTER && pixel_char != BLACK_COLOR){
                     int index = target_y * renderer->viewport_width + target_x;
                     renderer->buffer[index].Char.AsciiChar = pixel_char;
+                }
+                else if(pixel_char == BLACK_COLOR){
+                    int index = target_y * renderer->viewport_width + target_x;
+                    renderer->buffer[index].Char.AsciiChar = ' ';
                 }
             }
         }

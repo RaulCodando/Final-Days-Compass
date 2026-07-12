@@ -1,5 +1,7 @@
 #include "test_collision.h"
 #include "../../src/physics/collision.h"
+#include "../../src/utils/vector.h"
+#include "../../src/objects/entity.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -87,10 +89,12 @@ void test_resolve_map_collision(){
 void test_resolve_custom_collision(){
     Collider* collider_a = collider_create(0.0f, 0.0f, 1.0f, 1.0f);
     Collider* collider_b = collider_create(1.0f, 0.0f, 1.0f, 2.0f);
+    Vector* colliders = vector_create();
+    vector_push(colliders, collider_b);
     float vel_x = 1.0f;
     float vel_y = 1.0f;
 
-    resolve_custom_collision(collider_a, &vel_x, &vel_y, collider_b, 1);
+    resolve_custom_collision(collider_a, &vel_x, &vel_y, colliders);
     ASSERT_FLOAT_EQUAL(vel_x, 0.0f);
     ASSERT_FLOAT_EQUAL(vel_y, 1.0f);
     ASSERT_FLOAT_EQUAL(collider_a->x, 0.0f);
@@ -101,6 +105,29 @@ void test_resolve_custom_collision(){
     printf("Resolve custom collision passed\n");
 }
 
+void test_resolve_entity_collision(){
+    Sprite* sprite = sprite_create("tests/assets/test_entity_sprite.txt");
+    Entity* entity_a = entity_create(1, sprite, 10, 1, 1.0f, 0.0f, 0.0f);
+    Entity* entity_b = entity_create(1, sprite, 10, 1, 1.0f, 1.0f, 0.0f);
+    entity_init_collider(entity_a, 1.0f, 1.0f, 0.0f, 0.0f);
+    entity_init_collider(entity_b, 1.0f, 2.0f, 0.0f, 0.0f);
+    Vector* entities = vector_create();
+    vector_push(entities, entity_b);
+    float vel_x = 1.0f;
+    float vel_y = 1.0f;
+
+    resolve_entity_collision(entity_a, &vel_x, &vel_y, entities);
+    ASSERT_FLOAT_EQUAL(vel_x, 0.0f);
+    ASSERT_FLOAT_EQUAL(vel_y, 1.0f);
+    ASSERT_FLOAT_EQUAL(entity_a->collider->x, 0.0f);
+    ASSERT_FLOAT_EQUAL(entity_a->collider->y, 1.0f);
+
+    entity_destroy(entity_a);
+    entity_destroy(entity_b);
+    vector_destroy(entities);
+    printf("Resolve entity collision passed\n");
+}
+
 void test_collision(){
     test_collider_create();
     test_solid_tile_ids_init();
@@ -108,4 +135,5 @@ void test_collision(){
     test_is_tile_solid();
     test_resolve_map_collision();
     test_resolve_custom_collision();
+    test_resolve_entity_collision();
 }

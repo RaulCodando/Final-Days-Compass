@@ -32,7 +32,7 @@ void entity_init_collider(Entity* entity, float collider_width, float collider_h
     entity->offset_y = offset_y;
 }
 
-void entity_move_and_collide(Entity* entity, Map* map, SolidTileIDs* solid_tile_ids, Collider* colliders, int collider_count, Vector* entities){
+void entity_move_and_collide(Entity* entity, Map* map, SolidTileIDs* solid_tile_ids, Vector* colliders, Vector* entities){
     if(!entity) return;
 
     if(!entity->collider){
@@ -41,7 +41,7 @@ void entity_move_and_collide(Entity* entity, Map* map, SolidTileIDs* solid_tile_
         return;
     }
 
-    if (!map || !solid_tile_ids || (collider_count > 0 && !colliders)) return;
+    if (!map || !solid_tile_ids) return;
 
     entity->collider->x = entity->x_pos + entity->offset_x;
     entity->collider->y = entity->y_pos + entity->offset_y;
@@ -67,11 +67,11 @@ void entity_move_and_collide(Entity* entity, Map* map, SolidTileIDs* solid_tile_
         float zero_y = 0.0f;
         float collider_x_start = entity->collider->x;
         resolve_map_collision(entity->collider, &vx, &zero_y, map, solid_tile_ids);
-        if(collider_count > 0 && vx != 0.0f) {
+        if(colliders && vx != 0.0f) {
             entity->collider->x = collider_x_start;
-            resolve_custom_collision(entity->collider, &vx, &zero_y, colliders, collider_count);
+            resolve_custom_collision(entity->collider, &vx, &zero_y, colliders);
         }
-        if(entities && entities->size > 0 && vx != 0.0f) {
+        if(entities && vx != 0.0f) {
             entity->collider->x = collider_x_start;
             resolve_entity_collision(entity, &vx, &zero_y, entities);
         }
@@ -81,11 +81,11 @@ void entity_move_and_collide(Entity* entity, Map* map, SolidTileIDs* solid_tile_
         float zero_x = 0.0f; 
         float collider_y_start = entity->collider->y;
         resolve_map_collision(entity->collider, &zero_x, &vy, map, solid_tile_ids);
-        if(collider_count > 0 && vy != 0.0f) {
+        if(colliders && vy != 0.0f) {
             entity->collider->y = collider_y_start; 
-            resolve_custom_collision(entity->collider, &zero_x, &vy, colliders, collider_count);
+            resolve_custom_collision(entity->collider, &zero_x, &vy, colliders);
         }
-        if(entities && entities->size > 0 && vy != 0.0f) {
+        if(entities && vy != 0.0f) {
             entity->collider->y = collider_y_start; 
             resolve_entity_collision(entity, &zero_x, &vy, entities);
         }
