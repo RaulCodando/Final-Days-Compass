@@ -7,6 +7,7 @@ void test_is_collider_overlapping();
 void test_is_tile_solid();
 void test_resolve_map_collision();
 void test_resolve_custom_collision();
+void test_resolve_entity_collision();
 void test_collision();
 
 #endif // TEST_COLLISION_H
