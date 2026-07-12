@@ -78,7 +78,7 @@ void choose_test(){
             test_entity_manager();
             break;
         case 14:
-            test_init_world();
+            test_world_manager();
             break;
         case 15:
             test_game();
