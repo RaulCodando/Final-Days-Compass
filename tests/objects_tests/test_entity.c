@@ -80,7 +80,8 @@ void test_entity_move_and_collide(){
 
     Collider collider = { .x = 2.0f, .y = 1.0f, .width = 1.0f, .height = 2.0f };
 
-    Collider colliders[] = {collider};
+    Vector *colliders = vector_create();
+    vector_push(colliders, &collider);
 
     SolidTileIDs solid_tile_ids;
     char tile_ids[] = {1};
@@ -89,7 +90,7 @@ void test_entity_move_and_collide(){
     entity->vel_x = entity->speed;
     entity->vel_y = entity->speed;
 
-    entity_move_and_collide(entity, map, &solid_tile_ids, colliders, 1, entities);
+    entity_move_and_collide(entity, map, &solid_tile_ids, colliders, entities);
     
     ASSERT_FLOAT_EQUAL(entity->x_pos, 0.0f);
     ASSERT_FLOAT_EQUAL(entity->y_pos, 1.0f);
