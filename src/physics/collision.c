@@ -104,21 +104,22 @@ void resolve_map_collision(Collider* collider, float* vel_x, float* vel_y, Map* 
     }
 }
 
-void resolve_custom_collision(Collider* target_collider, float* vel_x, float* vel_y, Collider* colliders, int collider_count){
-    if(!target_collider || !colliders || collider_count <= 0) return;
+void resolve_custom_collision(Collider* target_collider, float* vel_x, float* vel_y, Vector* colliders){
+    if(!target_collider || !colliders) return;
 
     if(*vel_x != 0.0f){
         target_collider->x += *vel_x;
         
-        for(int i = 0; i < collider_count; i++){
-            if(&colliders[i] == target_collider) continue;
+        for(size_t i = 0; i < colliders->size; i++){
+            Collider* current_collider = (Collider*)vector_get(colliders, i);
+            if(current_collider == target_collider) continue;
 
-            if(is_collider_overlapping(target_collider, &colliders[i])){
+            if(is_collider_overlapping(target_collider, current_collider)){
                 if(*vel_x > 0.0f){
-                    target_collider->x = colliders[i].x - target_collider->width;
+                    target_collider->x = current_collider->x - target_collider->width;
                 }
                 else if (*vel_x < 0.0f){
-                    target_collider->x = colliders[i].x + colliders[i].width;
+                    target_collider->x = current_collider->x + current_collider->width;
                 }
                 *vel_x = 0.0f;
                 break;
@@ -129,15 +130,16 @@ void resolve_custom_collision(Collider* target_collider, float* vel_x, float* ve
     if(*vel_y != 0.0f){
         target_collider->y += *vel_y;
 
-        for(int i = 0; i < collider_count; i++){
-            if(&colliders[i] == target_collider) continue;
+        for(size_t i = 0; i < colliders->size; i++){
+            Collider* current_collider = (Collider*)vector_get(colliders, i);
+            if(current_collider == target_collider) continue;
 
-            if(is_collider_overlapping(target_collider, &colliders[i])){
+            if(is_collider_overlapping(target_collider, current_collider)){
                 if(*vel_y > 0.0f){
-                    target_collider->y = colliders[i].y - target_collider->height;
+                    target_collider->y = current_collider->y - target_collider->height;
                 }
                 else if (*vel_y < 0.0f){
-                    target_collider->y = colliders[i].y + colliders[i].height;
+                    target_collider->y = current_collider->y + current_collider->height;
                 }
                 *vel_y = 0.0f;
                 break;
@@ -147,7 +149,7 @@ void resolve_custom_collision(Collider* target_collider, float* vel_x, float* ve
 }
 
 void resolve_entity_collision(Entity* target_entity, float* vel_x, float* vel_y, Vector* entities){
-    if(!target_entity || !entities || entities->size <= 0) return;
+    if(!target_entity || !entities) return;
 
     Collider* target_collider = target_entity->collider;
 
