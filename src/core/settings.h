@@ -2,6 +2,7 @@
 #define SETTINGS_H
 
 #define BLANK_CHARACTER ' '
+#define BLACK_COLOR '_'
 #define SCREEN_WIDTH 80
 #define SCREEN_HEIGHT 32
 #define TARGET_FPS 30
