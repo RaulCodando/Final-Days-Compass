@@ -27,7 +27,6 @@ Game *game_create(void){
     game->custom_colliders = NULL;
     game->solid_tile_ids.tile_count = 0;
     game->entity_count = 0;
-    game->custom_collider_count = 0;
     game->delta_time = 0.0f;
     game->accumulator = 0.0f;
     game->is_running = false;
@@ -65,6 +64,16 @@ bool manage_world_init(Game *game, const char *map_file, int tile_size, char *ti
     return init_world(&game->map, &game->solid_tile_ids, map_file, tile_size, tile_ids, tile_count);
 }
 
+bool manage_world_colliders_init(Game *game){
+    if(game == NULL) return false;
+    return init_colliders(&game->custom_colliders);
+}
+
+bool manage_world_colliders_add(Game *game, float x, float y, float width, float height){
+    if(game == NULL) return false;
+    return add_collider(&game->custom_colliders, x, y, width, height);
+}
+
 void game_destroy(Game *game){
     if(game == NULL) return;
 
@@ -74,14 +83,19 @@ void game_destroy(Game *game){
         }
         vector_destroy(game->entities);
     }
+    if (game->custom_colliders != NULL) {
+        for(size_t i = 0; i < game->custom_colliders->size; i++){
+            collider_destroy((Collider*)vector_get(game->custom_colliders, i));
+        }
+        vector_destroy(game->custom_colliders);
+    }
     if (game->map != NULL) map_destroy(game->map);
-
-    solid_tile_ids_destroy(&game->solid_tile_ids);
-
     if (game->camera != NULL) camera_destroy(game->camera);
     if (game->asset_manager != NULL) asset_manager_destroy(game->asset_manager);
     if (game->renderer != NULL) renderer_destroy(game->renderer);
-    if (game->custom_colliders != NULL) free(game->custom_colliders);
+
+    solid_tile_ids_destroy(&game->solid_tile_ids);
+
     free(game);
 }
 
@@ -111,7 +125,7 @@ void game_update(Game *game){
     if (game->commands.move_up.active) player->vel_y = -1.0f * player->speed * game->delta_time;
     if (game->commands.move_down.active) player->vel_y = 1.0f * player->speed * game->delta_time;
     
-    entity_move_and_collide(player, game->map, &game->solid_tile_ids, game->custom_colliders, game->custom_collider_count, game->entities);
+    entity_move_and_collide(player, game->map, &game->solid_tile_ids, game->custom_colliders, game->entities);
 
     int map_width_px = game->map->width * game->map->tile_size;
     int map_height_px = game->map->height * game->map->tile_size;

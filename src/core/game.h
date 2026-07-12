@@ -32,8 +32,7 @@ typedef struct Game {
     // World
     Map *map;
     SolidTileIDs solid_tile_ids;
-    Collider *custom_colliders;
-    int custom_collider_count;
+    Vector *custom_colliders;
 
     // Time Settings
     LARGE_INTEGER frequency;
@@ -48,6 +47,8 @@ bool manage_entities_init(Game *game, ObjectIDs *object_ids, const char **sprite
 bool manage_entities_add(Game *game, ObjectIDs id, int health, int standard_attack, float speed, float x_pos, float y_pos, const char *sprite_path);
 bool manage_entities_init_collider(Game *game, ObjectIDs id, float collider_width, float collider_height, float offset_x, float offset_y);
 bool manage_world_init(Game *game, const char *map_file, int tile_size, char *tile_ids, int tile_count);
+bool manage_world_colliders_init(Game *game);
+bool manage_world_colliders_add(Game *game, float x, float y, float width, float height);
 void game_destroy(Game *game);
 void game_update(Game *game);
 void game_draw(Game *game);
