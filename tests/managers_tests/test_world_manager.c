@@ -2,6 +2,7 @@
 #include "../../src/managers/world_manager.h"
 #include "../../src/world/map.h"
 #include "../../src/physics/collision.h"
+#include "../../src/utils/vector.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -26,4 +27,29 @@ void test_init_world(void){
     map_destroy(map);
 
     printf("test_init_world passed\n");
+}
+
+void test_init_colliders(void){
+    Vector *colliders = vector_create();
+    bool result = init_colliders(&colliders);
+    assert(result == true);
+    assert(colliders != NULL);
+    vector_destroy(colliders);
+    printf("test_init_colliders passed\n");
+}
+
+void test_add_collider(void){
+    Vector *colliders = vector_create();
+    bool result = add_collider(&colliders, 0.0f, 0.0f, 1.0f, 1.0f);
+    assert(result == true);
+    assert(colliders != NULL);
+    assert(colliders->size == 1);
+    vector_destroy(colliders);
+    printf("test_add_collider passed\n");
+}
+
+void test_world_manager(void){
+    test_init_world();
+    test_init_colliders();
+    test_add_collider();
 }
