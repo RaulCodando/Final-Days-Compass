@@ -131,6 +131,16 @@ void test_game_run(void){
         assert(false);
     }
 
+    if(manage_world_colliders_init(game) == false){
+        game_destroy(game);
+        assert(false);
+    }
+
+    if(manage_world_colliders_add(game, 24.0f, 16.0f, 16.0f, 1.0f) == false){
+        game_destroy(game);
+        assert(false);
+    }
+
     game_run(game);
     game_destroy(game);
     system("cls");
