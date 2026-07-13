@@ -13,6 +13,7 @@ Entity* entity_create(ObjectIDs id, Sprite *sprite, int health, int standard_att
     entity->x_pos = x_pos;
     entity->y_pos = y_pos;
     entity->collider = NULL;
+    entity->update_behavior = NULL;
     entity->offset_x = 0.0f;
     entity->offset_y = 0.0f;
     entity->acc_x = 0.0f;

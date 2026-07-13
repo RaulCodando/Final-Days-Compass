@@ -5,6 +5,10 @@
 #include "../physics/collision.h"
 #include "../world/map.h"
 
+typedef struct Game Game;
+
+typedef void (*behavior_update)(Entity* self, Game *game_context);
+
 typedef struct Entity {
     GameObject base;
     
@@ -21,6 +25,8 @@ typedef struct Entity {
     float offset_y;
     float acc_x;
     float acc_y;
+
+    behavior_update update_behavior;
 } Entity;
 
 typedef struct Vector Vector;
