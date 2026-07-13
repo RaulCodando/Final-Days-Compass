@@ -1,6 +1,7 @@
 #include "test_game.h"
 #include "../../src/core/game.h"
 #include "../../src/entity_behaviors/player_behavior.h"
+#include "../../src/entity_behaviors/test_entity_behavior.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -124,7 +125,7 @@ void test_game_run(void){
         assert(false);
     }
 
-    if(manage_entities_add(game, TEST_ENTITY, 20, 1, 10.0f, 16.0f, 0.0f, "tests/assets/test_entity_sprite.txt") == false){
+    if(manage_entities_add(game, TEST_ENTITY, 20, 1, 10.0f, 0.0f, 28.0f, "tests/assets/test_entity_sprite.txt") == false){
         game_destroy(game);
         assert(false);
     }
@@ -140,6 +141,11 @@ void test_game_run(void){
     }
 
     if(manage_entities_add_behavior(game, PLAYER, player_update) == false){
+        game_destroy(game);
+        assert(false);
+    }
+
+    if(manage_entities_add_behavior(game, TEST_ENTITY, test_entity_behavior_update) == false){
         game_destroy(game);
         assert(false);
     }
