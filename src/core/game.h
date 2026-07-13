@@ -41,10 +41,13 @@ typedef struct Game {
     float delta_time;
 } Game;
 
+typedef void (*behavior_update)(Entity* self, Game *game_context);
+
 Game *game_create(void);
 bool manage_window_init(Game *game, float camera_x, float camera_y, float dead_zone_percentage);
 bool manage_entities_init(Game *game, ObjectIDs *object_ids, const char **sprite_paths, int sprite_count);
 bool manage_entities_add(Game *game, ObjectIDs id, int health, int standard_attack, float speed, float x_pos, float y_pos, const char *sprite_path);
+bool manage_entities_add_behavior(Game *game, ObjectIDs id, behavior_update behavior);
 bool manage_entities_init_collider(Game *game, ObjectIDs id, float collider_width, float collider_height, float offset_x, float offset_y);
 bool manage_world_init(Game *game, const char *map_file, int tile_size, char *tile_ids, int tile_count);
 bool manage_world_colliders_init(Game *game);
