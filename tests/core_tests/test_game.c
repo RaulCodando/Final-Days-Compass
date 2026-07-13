@@ -1,5 +1,6 @@
 #include "test_game.h"
 #include "../../src/core/game.h"
+#include "../../src/entity_behaviors/player_behavior.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -39,6 +40,18 @@ void test_manage_entities_add(void){
     assert(manage_entities_add(game, PLAYER, 20, 1, 10.0f, 0.0f, 0.0f, "tests/assets/test_player_sprite.txt") == true);
     game_destroy(game);
     printf("test_manage_entities_add passed.\n");
+}
+
+void test_manage_entities_add_behavior(void){
+    const char *sprite_paths[1] = {"tests/assets/test_player_sprite.txt"};
+    ObjectIDs object_ids[1] = {PLAYER};
+    Game *game = game_create();
+    assert(game != NULL);
+    assert(manage_entities_init(game, object_ids, sprite_paths, 1) == true);
+    assert(manage_entities_add(game, PLAYER, 20, 1, 10.0f, 0.0f, 0.0f, "tests/assets/test_player_sprite.txt") == true);
+    assert(manage_entities_add_behavior(game, PLAYER, player_update) == true);
+    game_destroy(game);
+    printf("test_manage_entities_add_behavior passed.\n");
 }
 
 void test_manage_entities_init_collider(void){
@@ -126,6 +139,11 @@ void test_game_run(void){
         assert(false);
     }
 
+    if(manage_entities_add_behavior(game, PLAYER, player_update) == false){
+        game_destroy(game);
+        assert(false);
+    }
+
     if(manage_world_init(game, "tests/assets/test_tile_map03.txt", 8, tile_ids, 1) == false){
         game_destroy(game);
         assert(false);
@@ -154,6 +172,7 @@ void test_game(void){
     test_manage_window_init();
     test_manage_entities_init();
     test_manage_entities_add();
+    test_manage_entities_add_behavior();
     test_manage_entities_init_collider();
     test_manage_world_init();
     test_game_update();
