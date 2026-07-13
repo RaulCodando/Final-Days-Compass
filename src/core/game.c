@@ -134,7 +134,7 @@ void game_update(Game *game){
         if(entity == NULL || entity->update_behavior == NULL) continue;
         
         entity->update_behavior(entity, game);
-        wrap_around_map(entity, map_width_px, map_height_px);
+        if(entity->vel_x != 0.0f || entity->vel_y != 0.0f) wrap_around_map(entity, map_width_px, map_height_px);
     }
 
     camera_update(game->camera, player->x_pos, player->y_pos, player->base.sprite->width, player->base.sprite->height, map_width_px, map_height_px);
