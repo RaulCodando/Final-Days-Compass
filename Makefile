@@ -22,7 +22,7 @@ TEST_OBJS     := $(patsubst %.c, $(BUILD_DIR)/%.o, $(notdir $(TEST_SOURCES)))
 
 # --- SEARCH DIRECTORIES (VPATH) ---
 # Hardcoded subdirectories to avoid breaking on Windows CMD with Linux 'find'
-VPATH = $(SRC_DIR):$(SRC_DIR)/graphics:$(SRC_DIR)/core:$(SRC_DIR)/input:$(SRC_DIR)/world:$(SRC_DIR)/objects:$(SRC_DIR)/physics:$(SRC_DIR)/utils:$(SRC_DIR)/persistence:$(SRC_DIR)/managers:$(TEST_DIR):$(TEST_DIR)/graphics_tests:$(TEST_DIR)/physics_tests:$(TEST_DIR)/core_tests:$(TEST_DIR)/input_tests:$(TEST_DIR)/world_tests:$(TEST_DIR)/objects_tests:$(TEST_DIR)/utils:$(TEST_DIR)/managers_tests
+VPATH = $(SRC_DIR):$(SRC_DIR)/graphics:$(SRC_DIR)/core:$(SRC_DIR)/input:$(SRC_DIR)/world:$(SRC_DIR)/objects:$(SRC_DIR)/physics:$(SRC_DIR)/utils:$(SRC_DIR)/persistence:$(SRC_DIR)/managers:$(SRC_DIR)/entity_behaviors:$(TEST_DIR):$(TEST_DIR)/graphics_tests:$(TEST_DIR)/physics_tests:$(TEST_DIR)/core_tests:$(TEST_DIR)/input_tests:$(TEST_DIR)/world_tests:$(TEST_DIR)/objects_tests:$(TEST_DIR)/utils:$(TEST_DIR)/managers_tests
 
 # --- MAIN RULES ---
 .PHONY: all test test_utils clean

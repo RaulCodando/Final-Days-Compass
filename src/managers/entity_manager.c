@@ -3,6 +3,7 @@
 #include "../graphics/sprite.h"
 #include "../objects/asset_manager.h"
 #include "../utils/vector.h"
+#include "../core/game.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -61,6 +62,22 @@ bool add_entity(Vector **game_entities, AssetManager **asset_manager, int *game_
     (*game_entity_count)++;
 
     return true;
+}
+
+bool add_entity_behavior(Vector **game_entities, ObjectIDs id, behavior_update behavior){
+    if(!game_entities || !(*game_entities) || behavior == NULL) return false;
+
+    bool added_behavior = false;
+    
+    for(size_t i = 0; i < (*game_entities)->size; i++){
+        Entity *entity = (Entity *) vector_get(*game_entities, i);
+        if(entity->base.id == id){
+            entity->update_behavior = behavior;
+            added_behavior = true;
+        }
+    }
+
+    return added_behavior;
 }
 
 bool init_entity_collider(Vector **game_entities, ObjectIDs id, float collider_width, float collider_height, float offset_x, float offset_y){

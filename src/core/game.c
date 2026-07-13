@@ -4,6 +4,8 @@
 #include "../managers/window_manager.h"
 #include "../managers/entity_manager.h"
 #include "../managers/world_manager.h"
+#include "../entity_behaviors/generic_entity_behaviors.h"
+#include "../entity_behaviors/player_behavior.h"
 #include "settings.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -50,6 +52,12 @@ bool manage_entities_add(Game *game, ObjectIDs id, int health, int standard_atta
     if(game == NULL) return false;
     
     return add_entity(&game->entities, &game->asset_manager, &game->entity_count, id, health, standard_attack, speed, x_pos, y_pos, sprite_path);
+}
+
+bool manage_entities_add_behavior(Game *game, ObjectIDs id, behavior_update behavior){
+    if(game == NULL) return false;
+    
+    return add_entity_behavior(&game->entities, id, behavior);
 }
 
 bool manage_entities_init_collider(Game *game, ObjectIDs id, float collider_width, float collider_height, float offset_x, float offset_y){
@@ -102,38 +110,32 @@ void game_destroy(Game *game){
 void game_update(Game *game){
     if(!game || !game->entities) return;
 
-    Entity *player = NULL;
-    for (size_t i = 0; i < game->entities->size; i++) {
-        Entity *entity = (Entity *)vector_get(game->entities, i);
-        if(entity == NULL) continue;
-        entity->vel_x = 0.0f;
-        entity->vel_y = 0.0f;
-        if(entity->base.id == PLAYER){
-            player = entity;
-        }
-    }
-
-    if(player == NULL) return;
-
     if (game->commands.quit_game.active) {
         game->is_running = false;
         return;
     }
 
-    if (game->commands.move_left.active) player->vel_x = -2.0f * player->speed * game->delta_time;
-    if (game->commands.move_right.active) player->vel_x = 2.0f * player->speed * game->delta_time;
-    if (game->commands.move_up.active) player->vel_y = -1.0f * player->speed * game->delta_time;
-    if (game->commands.move_down.active) player->vel_y = 1.0f * player->speed * game->delta_time;
-    
-    entity_move_and_collide(player, game->map, &game->solid_tile_ids, game->custom_colliders, game->entities);
-
+    Entity *player = NULL;
     int map_width_px = game->map->width * game->map->tile_size;
     int map_height_px = game->map->height * game->map->tile_size;
 
-    if(player->x_pos >= (float)map_width_px) player->x_pos = 0.0f - player->base.sprite->width;
-    if(player->x_pos + player->base.sprite->width < 0) player->x_pos = (float)map_width_px - 1.0f;
-    if(player->y_pos >= (float)map_height_px) player->y_pos = 0.0f - player->base.sprite->height;
-    if(player->y_pos + player->base.sprite->height < 0) player->y_pos = (float)map_height_px - 1.0f;
+    for (size_t i = 0; i < game->entities->size; i++) {
+        Entity *entity = (Entity *)vector_get(game->entities, i);
+        if(entity == NULL) continue;
+        entity->vel_x = 0.0f;
+        entity->vel_y = 0.0f;
+        if(entity->base.id == PLAYER) player = entity;
+    }
+
+    if(player == NULL) return;
+
+    for (size_t i = 0; i < game->entities->size; i++) {
+        Entity *entity = (Entity *)vector_get(game->entities, i);
+        if(entity == NULL || entity->update_behavior == NULL) continue;
+        
+        entity->update_behavior(entity, game);
+        wrap_around_map(entity, map_width_px, map_height_px);
+    }
 
     camera_update(game->camera, player->x_pos, player->y_pos, player->base.sprite->width, player->base.sprite->height, map_width_px, map_height_px);
 }

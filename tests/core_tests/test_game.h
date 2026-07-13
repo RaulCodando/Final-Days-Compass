@@ -4,6 +4,7 @@
 void test_game_create(void);
 void test_manage_window_init(void);
 void test_manage_entities_init(void);
+void test_manage_entities_add_behavior(void);
 void test_manage_entities_add(void);
 void test_manage_entities_init_collider(void);
 void test_manage_world_init(void);
