@@ -24,6 +24,7 @@ void renderer_draw_tile(Renderer *renderer, int x, int y, enum TileIDs id, struc
 void renderer_draw_map(Renderer *renderer, struct Camera *camera, struct Map *map);
 void renderer_present(Renderer *renderer);
 void renderer_draw_debug_collider(Renderer *renderer, struct Collider *collider, int collider_x, int collider_y);
+void renderer_apply_dim(Renderer *renderer, int dim_amount);
 void renderer_destroy(Renderer *renderer);
 
 #endif //RENDERER_H

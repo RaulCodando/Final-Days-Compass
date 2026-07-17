@@ -19,9 +19,31 @@ void commands_init(Commands *commands) {
 void commands_update(Commands *commands, InputKeyboardState *keyboard) {
     if (!commands || !keyboard) return;
 
+    commands->quit_game.previous = commands->quit_game.active;
+    commands->quit_game.active  = keyboard_is_key_pressed(keyboard, commands->quit_game.key_binding);
+    commands->quit_game.triggered = commands->quit_game.active && !commands->quit_game.previous;
+
     commands->move_left.active  = keyboard_is_key_pressed(keyboard, commands->move_left.key_binding);
     commands->move_right.active = keyboard_is_key_pressed(keyboard, commands->move_right.key_binding);
     commands->move_up.active    = keyboard_is_key_pressed(keyboard, commands->move_up.key_binding);
     commands->move_down.active  = keyboard_is_key_pressed(keyboard, commands->move_down.key_binding);
-    commands->quit_game.active  = keyboard_is_key_pressed(keyboard, commands->quit_game.key_binding);
+}
+
+void commands_stop(Commands *commands){
+    if(!commands) return;
+
+    commands->move_left.active = false;
+    commands->move_left.triggered = false;
+
+    commands->move_right.active = false;
+    commands->move_right.triggered = false;
+
+    commands->move_up.active = false;
+    commands->move_up.triggered = false;
+
+    commands->move_down.active = false;
+    commands->move_down.triggered = false;
+
+    commands->quit_game.active = false;
+    commands->quit_game.triggered = false;
 }

@@ -24,7 +24,7 @@ bool init_entities(Vector **game_entities, AssetManager **asset_manager, ObjectI
         for (int i = 0; i < sprite_count; i++) {
             if(sprite_paths[i] == NULL) {
                 asset_manager_destroy(*asset_manager);
-                vector_destroy(*game_entities);
+                vector_destroy(*game_entities, NULL);
                 *asset_manager = NULL;
                 *game_entities = NULL;
                 return false;
@@ -34,7 +34,7 @@ bool init_entities(Vector **game_entities, AssetManager **asset_manager, ObjectI
             if(sprite == NULL){
                 printf("Failed to load/get sprite path: %s\n", sprite_paths[i]);
                 asset_manager_destroy(*asset_manager);
-                vector_destroy(*game_entities);
+                vector_destroy(*game_entities, NULL);
                 *asset_manager = NULL;
                 *game_entities = NULL;
                 return false;

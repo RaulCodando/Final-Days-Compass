@@ -10,6 +10,7 @@
 #include "../world/map.h"
 #include "../physics/collision.h"
 #include "../utils/vector.h"
+#include "../core/state_manager.h"
 #include <stdbool.h>
 #include <windows.h>
 
@@ -33,6 +34,9 @@ typedef struct Game {
     Map *map;
     SolidTileIDs solid_tile_ids;
     Vector *custom_colliders;
+
+    // Game States
+    StateManager *state_manager;
 
     // Time Settings
     LARGE_INTEGER frequency;

@@ -38,7 +38,7 @@ void renderer_clear(Renderer *renderer){
     int total_pixels = renderer->viewport_width * renderer->viewport_height;
     for (int i = 0; i < total_pixels; i++){
         renderer->buffer[i].Char.AsciiChar = BLANK_CHARACTER;
-        renderer->buffer[i].Attributes = FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED; // Branco padrão
+        renderer->buffer[i].Attributes = FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY;
     }
 }
 
@@ -124,6 +124,24 @@ void renderer_draw_debug_collider(Renderer *renderer, struct Collider *collider,
                 renderer->buffer[index].Attributes = FOREGROUND_RED | FOREGROUND_INTENSITY;
             }
         }
+    }
+}
+
+void renderer_apply_dim(Renderer *renderer, int dim_amount) {
+    if (!renderer || !renderer->buffer) return;
+
+    int total_cells = renderer->viewport_width * renderer->viewport_height;
+
+    for (int i = 0; i < total_cells; i++) {
+        WORD attr = renderer->buffer[i].Attributes;
+
+        if (dim_amount == 1) attr &= ~FOREGROUND_INTENSITY;
+        else if (dim_amount >= 2) {
+            attr &= ~(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+            attr |= FOREGROUND_INTENSITY; 
+        }
+
+        renderer->buffer[i].Attributes = attr;
     }
 }
 

@@ -100,8 +100,7 @@ void test_resolve_custom_collision(){
     ASSERT_FLOAT_EQUAL(collider_a->x, 0.0f);
     ASSERT_FLOAT_EQUAL(collider_a->y, 1.0f);
 
-    collider_destroy(collider_a);
-    collider_destroy(collider_b);
+    vector_destroy(colliders, (destroy_data_func)collider_destroy);
     printf("Resolve custom collision passed\n");
 }
 
@@ -122,9 +121,7 @@ void test_resolve_entity_collision(){
     ASSERT_FLOAT_EQUAL(entity_a->collider->x, 0.0f);
     ASSERT_FLOAT_EQUAL(entity_a->collider->y, 1.0f);
 
-    entity_destroy(entity_a);
-    entity_destroy(entity_b);
-    vector_destroy(entities);
+    vector_destroy(entities, (destroy_data_func)entity_destroy);
     printf("Resolve entity collision passed\n");
 }
 
