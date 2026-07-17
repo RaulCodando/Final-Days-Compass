@@ -19,7 +19,7 @@ void test_init_entities(void) {
     assert(game_entities != NULL);
     assert(asset_manager != NULL);
 
-    vector_destroy(game_entities);
+    vector_destroy(game_entities, NULL);
     asset_manager_destroy(asset_manager);
     printf("test_init_entities passed\n");
 }
@@ -40,7 +40,7 @@ void test_add_entity(void) {
     assert(player != NULL);
     entity_destroy(player);
     
-    vector_destroy(game_entities);
+    vector_destroy(game_entities, (destroy_data_func)entity_destroy);
     asset_manager_destroy(asset_manager);
     printf("test_add_entity passed\n");
 }
@@ -61,7 +61,7 @@ void test_add_entity_behavior(void) {
     assert(player != NULL);
     entity_destroy(player);
     
-    vector_destroy(game_entities);
+    vector_destroy(game_entities, (destroy_data_func)entity_destroy);
     asset_manager_destroy(asset_manager);
     printf("test_add_entity_behavior passed\n");
 }
@@ -81,7 +81,7 @@ void test_init_entity_collider(void) {
     Entity *player = (Entity*)vector_get(game_entities, 0);
 
     entity_destroy(player);
-    vector_destroy(game_entities);
+    vector_destroy(game_entities, (destroy_data_func)entity_destroy);
     asset_manager_destroy(asset_manager);
     printf("test_init_entity_collider passed\n");
 }
