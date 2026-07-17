@@ -5,6 +5,7 @@
 
 void player_update(Entity* self, Game* game){
     if(!self || !game) return;
+    if(&game->commands == NULL) return;
 
     if (game->commands.move_left.active) self->vel_x = -2.0f * self->speed * game->delta_time;
     if (game->commands.move_right.active) self->vel_x = 2.0f * self->speed * game->delta_time;
