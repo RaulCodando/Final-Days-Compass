@@ -12,8 +12,14 @@ Vector *vector_create(void){
 }
 
 
-void vector_destroy(Vector *vector){
+void vector_destroy(Vector *vector, destroy_data_func destroy_data){
     if(vector == NULL) return;
+
+    if(destroy_data != NULL && vector->data != NULL){
+        for(size_t i = 0; i < vector->size; i++){
+            destroy_data(vector->data[i]);
+        }
+    }
 
     free(vector->data);
     free(vector);

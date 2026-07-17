@@ -10,8 +10,10 @@ typedef struct Vector {
     size_t size;
 } Vector;
 
+typedef void (*destroy_data_func)(void *data);
+
 Vector *vector_create(void);
-void vector_destroy(Vector *vector);
+void vector_destroy(Vector *vector, destroy_data_func destroy_data);
 bool vector_push(Vector *vector, void *element);
 bool vector_insert(Vector *vector, void *element, size_t index);
 bool vector_reserve(Vector *vector, size_t capacity);
