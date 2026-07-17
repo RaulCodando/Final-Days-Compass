@@ -5,6 +5,8 @@
 
 typedef struct{
     bool active;
+    bool previous;
+    bool triggered;
     InputKey key_binding;
 } Command;
 
@@ -16,7 +18,8 @@ typedef struct{
     Command quit_game;
 } Commands;
 
-void commands_init();
+void commands_init(Commands *commands);
 void commands_update(Commands *commands, InputKeyboardState *kayboard);
+void commands_stop(Commands *commands);
 
 #endif
