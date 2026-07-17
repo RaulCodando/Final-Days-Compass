@@ -34,7 +34,7 @@ void test_init_colliders(void){
     bool result = init_colliders(&colliders);
     assert(result == true);
     assert(colliders != NULL);
-    vector_destroy(colliders);
+    vector_destroy(colliders, NULL);
     printf("test_init_colliders passed\n");
 }
 
@@ -44,7 +44,7 @@ void test_add_collider(void){
     assert(result == true);
     assert(colliders != NULL);
     assert(colliders->size == 1);
-    vector_destroy(colliders);
+    vector_destroy(colliders, (destroy_data_func)collider_destroy);
     printf("test_add_collider passed\n");
 }
 
