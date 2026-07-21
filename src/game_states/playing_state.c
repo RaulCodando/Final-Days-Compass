@@ -9,15 +9,15 @@
 
 
 
-static void playing_state_enter(Game *game){
+static void playing_state_enter(Game *game, void *state_data){
     
 }
 
-static void playing_state_exit(Game *game){
+static void playing_state_exit(Game *game, void *state_data){
     
 }
 
-static void playing_state_update(Game *game){
+static void playing_state_update(Game *game, void *state_data){
     if(!game || !game->entities) return;
 
     if (game->commands.quit_game.triggered) {
@@ -52,7 +52,7 @@ static void playing_state_update(Game *game){
     camera_update(game->camera, player->x_pos, player->y_pos, player->base.sprite->width, player->base.sprite->height, map_width_px, map_height_px);
 }
 
-static void playing_state_render(Game *game){
+static void playing_state_render(Game *game, void *state_data){
     if(!game || !game->entities) return;
 
     if (game->map != NULL) {
@@ -71,7 +71,7 @@ static void playing_state_render(Game *game){
 }
 
 GameState *playing_state_create(){
-    GameState *state = malloc(sizeof(GameState));
+    GameState *state = calloc(1, sizeof(GameState));
     if(state == NULL) return NULL;
     state->type = STATE_PLAYING;
     state->update_lower_state = false;
