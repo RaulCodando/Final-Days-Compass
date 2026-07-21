@@ -9,6 +9,7 @@
 #include "../entity_behaviors/player_behavior.h"
 #include "../game_states/playing_state.h"
 #include "../utils/stack.h"
+#include "../ui/hud.h"
 #include "settings.h"
 #include <stdlib.h>
 #include <stdio.h>
