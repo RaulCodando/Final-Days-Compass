@@ -7,6 +7,7 @@ static const int WINDOWS_VK_MAPPING[INPUT_KEY_COUNT] = {
     VK_RIGHT,
     VK_UP,
     VK_DOWN,
+    VK_RETURN
 };
 
 void keyboard_init(InputKeyboardState *input) {
