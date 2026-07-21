@@ -4,6 +4,7 @@
 #include "../core/settings.h"
 #include "camera.h"
 #include "../physics/collision.h"
+#include "../ui/hud.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <windows.h>
@@ -55,10 +56,12 @@ void renderer_draw(Renderer *renderer, int x, int y, struct Sprite *sprite){
                 if(pixel_char != BLANK_CHARACTER && pixel_char != BLACK_COLOR){
                     int index = target_y * renderer->viewport_width + target_x;
                     renderer->buffer[index].Char.AsciiChar = pixel_char;
+                    renderer->buffer[index].Attributes = FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY;
                 }
                 else if(pixel_char == BLACK_COLOR){
                     int index = target_y * renderer->viewport_width + target_x;
                     renderer->buffer[index].Char.AsciiChar = ' ';
+                    renderer->buffer[index].Attributes = FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY;
                 }
             }
         }
@@ -142,6 +145,58 @@ void renderer_apply_dim(Renderer *renderer, int dim_amount) {
         }
 
         renderer->buffer[i].Attributes = attr;
+    }
+}
+
+void renderer_draw_hud_element(Renderer *renderer, struct HudElement *element) {
+    if (!renderer || !element) return;
+
+    switch (element->type) {
+        case HUD_CONTAINER: {
+            HudContainerElement *container = element->data.container;
+            if (!container) break;
+
+            if (container->sprites && container->sprites[container->current_state_index]) {
+                Sprite *sprite = container->sprites[container->current_state_index];
+                renderer_draw(renderer, element->x, element->y, sprite);
+            }
+
+            for (int i = 0; i < container->childCount; i++) {
+                renderer_draw_hud_element(renderer, container->children[i]);
+            }
+            break;
+        }
+
+        case HUD_TEXT: {
+            HudTextElement *text_elem = element->data.text;
+            if (!text_elem || !text_elem->text) break;
+
+            int len = text_elem->width;
+            for (int i = 0; i < len; i++) {
+                int target_x = element->x + i;
+                int target_y = element->y;
+
+                if (target_x >= 0 && target_x < renderer->viewport_width &&
+                    target_y >= 0 && target_y < renderer->viewport_height) {
+                    
+                    int index = target_y * renderer->viewport_width + target_x;
+                    renderer->buffer[index].Char.AsciiChar = text_elem->text[i];
+                    renderer->buffer[index].Attributes = FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+                }
+            }
+            break;
+        }
+
+        case HUD_ICON: {
+            HudIconElement *icon = element->data.icon;
+            if (!icon || !icon->sprites) break;
+
+            Sprite *sprite = icon->sprites[icon->current_state_index];
+            if (sprite) {
+                renderer_draw(renderer, element->x, element->y, sprite);
+            }
+            break;
+        }
     }
 }
 
