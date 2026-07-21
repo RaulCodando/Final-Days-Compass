@@ -15,11 +15,13 @@ typedef struct GameState {
     
     bool update_lower_state;
     bool render_lower_state;
+
+    void *state_data;
     
-    void (*enter) (Game *game);
-    void (*exit) (Game *game);
-    void (*update) (Game *game);
-    void (*render) (Game *game);
+    void (*enter) (Game *game, void *state_data);
+    void (*exit) (Game *game, void *state_data);
+    void (*update) (Game *game, void *state_data);
+    void (*render) (Game *game, void *state_data);
 } GameState;
 
 void game_state_destroy(GameState *state);
