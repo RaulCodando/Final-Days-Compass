@@ -25,7 +25,7 @@ void state_manager_destroy(StateManager *state_manager){
 
 void state_manager_push(StateManager *state_manager, GameState *state, Game *game){
     if(state_manager == NULL || state == NULL || game == NULL) return;
-    if(state->enter != NULL) state->enter(game);
+    if(state->enter != NULL) state->enter(game, state->state_data);
     stack_push(state_manager->states, (void*) state);
 }
 
@@ -33,7 +33,7 @@ void state_manager_pop(StateManager *state_manager, Game *game){
     if(state_manager == NULL || game == NULL) return;
     GameState *state = state_manager_peek(state_manager);
     if(state != NULL) {
-        if(state->exit != NULL) state->exit(game);
+        if(state->exit != NULL) state->exit(game, state->state_data);
         game_state_destroy(stack_pop(state_manager->states));
     }
 }
@@ -51,7 +51,7 @@ void state_manager_update(StateManager *state_manager, Game *game, Node *current
         game->commands = original_commands;
     }
 
-    state->update(game);
+    state->update(game, state->state_data);
 }
 
 
@@ -66,7 +66,7 @@ void state_manager_render(StateManager *state_manager, Game *game, Node *current
         renderer_apply_dim(game->renderer, 2);
     }
 
-    state->render(game);
+    state->render(game, state->state_data);
 }
 
 GameState *state_manager_peek(StateManager *state_manager){

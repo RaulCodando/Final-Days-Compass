@@ -16,6 +16,7 @@ typedef struct{
     Command move_up;
     Command move_down;
     Command quit_game;
+    Command confirm;
 } Commands;
 
 void commands_init(Commands *commands);
