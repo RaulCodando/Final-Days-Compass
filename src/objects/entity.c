@@ -3,12 +3,11 @@
 #include <stdlib.h>
 #include <math.h>
 
-Entity* entity_create(ObjectIDs id, Sprite *sprite, int health, int standard_attack, float speed, float x_pos, float y_pos){
+Entity* entity_create(ObjectIDs id, Sprite *sprite, void *entity_data, float speed, float x_pos, float y_pos){
     Entity *entity = (Entity *) malloc(sizeof(Entity));
     if(!entity) return NULL;
     game_object_init(&(entity->base), id, sprite);
-    entity->health = health;
-    entity->standard_attack = standard_attack;
+    entity->entity_data = entity_data;
     entity->speed = speed;
     entity->x_pos = x_pos;
     entity->y_pos = y_pos;

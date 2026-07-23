@@ -2,6 +2,8 @@
 #include "../../src/core/game.h"
 #include "../../src/entity_behaviors/player_behavior.h"
 #include "../../src/entity_behaviors/test_entity_behavior.h"
+#include "../../src/entities/player.h"
+#include "../../src/entities/dummy_entity.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -23,48 +25,21 @@ void test_manage_window_init(void){
 }
 
 void test_manage_entities_init(void){
-    const char *sprite_paths[1] = {"tests/assets/test_player_sprite.txt"};
-    ObjectIDs object_ids[1] = {PLAYER};
     Game *game = game_create();
     assert(game != NULL);
-    assert(manage_entities_init(game, object_ids, sprite_paths, 1) == true);
+    assert(manage_entities_init(game) == true);
     game_destroy(game);
     printf("test_manage_entities_init passed.\n");
 }
 
 void test_manage_entities_add(void){
-    const char *sprite_paths[1] = {"tests/assets/test_player_sprite.txt"};
-    ObjectIDs object_ids[1] = {PLAYER};
     Game *game = game_create();
     assert(game != NULL);
-    assert(manage_entities_init(game, object_ids, sprite_paths, 1) == true);
-    assert(manage_entities_add(game, PLAYER, 20, 1, 10.0f, 0.0f, 0.0f, "tests/assets/test_player_sprite.txt") == true);
+    assert(manage_entities_init(game) == true);
+    Entity *test_entity = entity_create(TEST_ENTITY, NULL, NULL, 10.0f, 0.0f, 0.0f);
+    assert(manage_entities_add(game, test_entity) == true);
     game_destroy(game);
     printf("test_manage_entities_add passed.\n");
-}
-
-void test_manage_entities_add_behavior(void){
-    const char *sprite_paths[1] = {"tests/assets/test_player_sprite.txt"};
-    ObjectIDs object_ids[1] = {PLAYER};
-    Game *game = game_create();
-    assert(game != NULL);
-    assert(manage_entities_init(game, object_ids, sprite_paths, 1) == true);
-    assert(manage_entities_add(game, PLAYER, 20, 1, 10.0f, 0.0f, 0.0f, "tests/assets/test_player_sprite.txt") == true);
-    assert(manage_entities_add_behavior(game, PLAYER, player_update) == true);
-    game_destroy(game);
-    printf("test_manage_entities_add_behavior passed.\n");
-}
-
-void test_manage_entities_init_collider(void){
-    const char *sprite_paths[1] = {"tests/assets/test_player_sprite.txt"};
-    ObjectIDs object_ids[1] = {PLAYER};
-    Game *game = game_create();
-    assert(game != NULL);
-    assert(manage_entities_init(game, object_ids, sprite_paths, 1) == true);
-    assert(manage_entities_add(game, PLAYER, 20, 1, 10.0f, 0.0f, 0.0f, "tests/assets/test_player_sprite.txt") == true);
-    assert(manage_entities_init_collider(game, PLAYER, 2.0f, 8.0f, 3.0f, 0.0f) == true);
-    game_destroy(game);
-    printf("test_manage_entities_init_collider passed.\n");
 }
 
 void test_manage_world_init(void){
@@ -104,48 +79,25 @@ void test_game_loop(void){
 
 void test_game_run(void){
     Game *game = game_create();
-    const char *sprite_paths[2] = {"tests/assets/test_player_sprite.txt", 
-                                   "tests/assets/test_entity_sprite.txt"};
-    static char tile_ids[1] = {(char) 5};
-    ObjectIDs object_ids[2] = {PLAYER, TEST_ENTITY};
     assert(game != NULL);
+    static char tile_ids[1] = {(char) 5};
 
     if(manage_window_init(game, 0.0f, 0.0f, 0.25f) == false){
         game_destroy(game);
         assert(false);
     }
 
-    if(manage_entities_init(game, object_ids, sprite_paths, 2) == false){
+    if(manage_entities_init(game) == false){
         game_destroy(game);
         assert(false);
     }
 
-    if(manage_entities_add(game, PLAYER, 20, 1, 10.0f, 0.0f, 0.0f, "tests/assets/test_player_sprite.txt") == false){
+    if(player_spawn(game, 0.0f, 0.0f) == false){
         game_destroy(game);
         assert(false);
     }
 
-    if(manage_entities_add(game, TEST_ENTITY, 20, 1, 10.0f, 0.0f, 28.0f, "tests/assets/test_entity_sprite.txt") == false){
-        game_destroy(game);
-        assert(false);
-    }
-
-    if(manage_entities_init_collider(game, PLAYER, 2.0f, 8.0f, 3.0f, 0.0f) == false){
-        game_destroy(game);
-        assert(false);
-    }
-
-    if(manage_entities_init_collider(game, TEST_ENTITY, 4.0f, 8.0f, 2.0f, 0.0f) == false){
-        game_destroy(game);
-        assert(false);
-    }
-
-    if(manage_entities_add_behavior(game, PLAYER, player_update) == false){
-        game_destroy(game);
-        assert(false);
-    }
-
-    if(manage_entities_add_behavior(game, TEST_ENTITY, test_entity_behavior_update) == false){
+    if(test_entity_spawn(game, 0.0f, 28.0f) == false){
         game_destroy(game);
         assert(false);
     }
@@ -179,8 +131,6 @@ void test_game(void){
     test_manage_window_init();
     test_manage_entities_init();
     test_manage_entities_add();
-    test_manage_entities_add_behavior();
-    test_manage_entities_init_collider();
     test_manage_world_init();
     test_game_update();
     

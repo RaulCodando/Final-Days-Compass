@@ -21,8 +21,6 @@ void print_entity(Entity *entity){
     }
 
     printf("Entity ID: %d\n", entity->base.id);
-    printf("Entity Health: %d\n", entity->health);
-    printf("Entity Standard Attack: %d\n", entity->standard_attack);
     printf("Entity Speed: %f\n", entity->speed);
     printf("Entity X Position: %f\n", entity->x_pos);
     printf("Entity Y Position: %f\n", entity->y_pos);
@@ -32,7 +30,7 @@ void test_entity_create(){
     Sprite *sprite = sprite_create("tests/assets/test_sprite04.txt");
     assert(sprite != NULL);
 
-    Entity *entity = entity_create(PLAYER, sprite, 100, 10, 1.0f, 0.0f, 0.0f);
+    Entity *entity = entity_create(PLAYER, sprite, NULL, 1.0f, 0.0f, 0.0f);
     assert(entity != NULL);
 
     print_entity(entity);
@@ -45,7 +43,7 @@ void test_entity_init_collider(){
     Sprite *sprite = sprite_create("tests/assets/test_sprite04.txt");
     assert(sprite != NULL);
 
-    Entity *entity = entity_create(PLAYER, sprite, 100, 10, 1.0f, 0.0f, 0.0f);
+    Entity *entity = entity_create(PLAYER, sprite, NULL, 1.0f, 0.0f, 0.0f);
     assert(entity != NULL);
 
     entity_init_collider(entity, 1.0f, 1.0f, 1.0f, 1.0f);
@@ -70,7 +68,7 @@ void test_entity_move_and_collide(){
     Sprite* sprite = sprite_create("tests/assets/test_sprite04.txt");
     assert(sprite != NULL);
 
-    Entity* entity = entity_create(PLAYER, sprite, 100, 10, 1.0f, 0.0f, 0.0f);
+    Entity* entity = entity_create(PLAYER, sprite, NULL, 1.0f, 0.0f, 0.0f);
     assert(entity != NULL);
 
     Vector* entities = vector_create();

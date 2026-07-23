@@ -106,8 +106,8 @@ void test_resolve_custom_collision(){
 
 void test_resolve_entity_collision(){
     Sprite* sprite = sprite_create("tests/assets/test_entity_sprite.txt");
-    Entity* entity_a = entity_create(1, sprite, 10, 1, 1.0f, 0.0f, 0.0f);
-    Entity* entity_b = entity_create(1, sprite, 10, 1, 1.0f, 1.0f, 0.0f);
+    Entity* entity_a = entity_create(1, sprite, NULL, 1.0f, 0.0f, 0.0f);
+    Entity* entity_b = entity_create(1, sprite, NULL, 1.0f, 1.0f, 0.0f);
     entity_init_collider(entity_a, 1.0f, 1.0f, 0.0f, 0.0f);
     entity_init_collider(entity_b, 1.0f, 2.0f, 0.0f, 0.0f);
     Vector* entities = vector_create();
