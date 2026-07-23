@@ -28,16 +28,15 @@ Game *game_create(void){
     game->entities = NULL;
     game->map = NULL;
     game->renderer = NULL;
-    game->asset_manager = NULL;
     game->solid_tile_ids.solid_tile_ids = NULL;
     game->custom_colliders = NULL;
     game->state_manager = NULL;
     game->solid_tile_ids.tile_count = 0;
-    game->entity_count = 0;
     game->delta_time = 0.0f;
     game->accumulator = 0.0f;
     game->is_running = false;
     game->state_manager = state_manager_create();
+    game->asset_manager = asset_manager_create();
     
     return game;
 }
@@ -47,24 +46,14 @@ bool manage_window_init(Game *game, float camera_x, float camera_y, float dead_z
     return init_window(&game->camera, &game->renderer, camera_x, camera_y, dead_zone_percentage);
 }
 
-bool manage_entities_init(Game *game, ObjectIDs *object_ids, const char **sprite_paths, int sprite_count){
+bool manage_entities_init(Game *game){
     if(game == NULL) return false;    
-    return init_entities(&game->entities, &game->asset_manager, object_ids, sprite_paths, sprite_count);
+    return init_entities(&game->entities);
 }
 
-bool manage_entities_add(Game *game, ObjectIDs id, int health, int standard_attack, float speed, float x_pos, float y_pos, const char *sprite_path){
+bool manage_entities_add(Game *game, Entity* entity){
     if(game == NULL) return false;
-    return add_entity(&game->entities, &game->asset_manager, &game->entity_count, id, health, standard_attack, speed, x_pos, y_pos, sprite_path);
-}
-
-bool manage_entities_add_behavior(Game *game, ObjectIDs id, behavior_update behavior){
-    if(game == NULL) return false;
-    return add_entity_behavior(&game->entities, id, behavior);
-}
-
-bool manage_entities_init_collider(Game *game, ObjectIDs id, float collider_width, float collider_height, float offset_x, float offset_y){
-    if(game == NULL) return false;
-    return init_entity_collider(&game->entities, id, collider_width, collider_height, offset_x, offset_y);
+    return add_entity(&game->entities, entity);
 }
 
 bool manage_world_init(Game *game, const char *map_file, int tile_size, char *tile_ids, int tile_count){
