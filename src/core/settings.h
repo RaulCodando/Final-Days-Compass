@@ -3,8 +3,8 @@
 
 #define RENDER_SCALE 4.0f
 #define FONT_SIZE 8.0F
-#define SCREEN_WIDTH 320
-#define SCREEN_HEIGHT 180
+#define SCREEN_WIDTH 480
+#define SCREEN_HEIGHT 270
 #define TARGET_FPS 30
 #define TARGET_FRAME_TIME (1.0f / TARGET_FPS)
 #define FIXED_TIME_STEP (1.0f / 60.0f)
