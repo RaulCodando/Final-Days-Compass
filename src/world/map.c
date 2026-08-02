@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-Map *map_create(int width, int height, int tile_size) {
+Map *map_create(SDL_Renderer *renderer, int width, int height, int tile_size, SDL_Color color) {
     if (width <= 0 || height <= 0 || tile_size <= 0) return NULL;
 
     Map *map = malloc(sizeof(Map));
@@ -12,7 +12,7 @@ Map *map_create(int width, int height, int tile_size) {
     map->height = height;
     map->tile_size = tile_size;
 
-    map->tileset = tileset_create(tile_size, tile_size);
+    map->tileset = tileset_create(renderer, tile_size, tile_size, color);
     if (!map->tileset) {
         free(map);
         return NULL;
@@ -50,7 +50,7 @@ TileIDs map_get_tile_id(Map *map, int x, int y){
     return (TileIDs) map->tile_ids[y * map->width + x];
 }
 
-Map *map_create_from_file(const char *filepath, int tile_size){
+Map *map_create_from_file(SDL_Renderer *renderer, const char *filepath, int tile_size, SDL_Color color){
     FILE *file = fopen(filepath, "rb");
     if(!file) return NULL;
 
@@ -73,7 +73,7 @@ Map *map_create_from_file(const char *filepath, int tile_size){
         return NULL;
     }
 
-    Map *map = map_create(width, height, tile_size);
+    Map *map = map_create(renderer, width, height, tile_size, color);
     if(!map) {
         fclose(file);
         return NULL;
