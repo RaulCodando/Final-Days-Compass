@@ -20,7 +20,7 @@ typedef struct{
 } Commands;
 
 void commands_init(Commands *commands);
-void commands_update(Commands *commands, InputKeyboardState *kayboard);
+void commands_update(Commands *commands, InputKeyboardState *keyboard);
 void commands_stop(Commands *commands);
 
 #endif
