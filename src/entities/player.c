@@ -14,7 +14,7 @@ bool player_spawn(Game *game, float x, float y){
     Entity *player = entity_create(PLAYER, sprite, NULL, 10.0f, x, y);
     if (!player) return false;
     
-    entity_init_collider(player, 8.0f, 32.0f, 12.0f, 0.0f);
+    entity_init_collider(player, 6.0f, 32.0f, 3.0f, 0.0f);
     player->update_behavior = player_update;
 
     return manage_entities_add(game, player);
