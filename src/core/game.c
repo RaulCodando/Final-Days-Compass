@@ -21,9 +21,9 @@ Game *game_create(void){
 
     keyboard_init(&game->keyboard);
     commands_init(&game->commands);
-    QueryPerformanceFrequency(&game->frequency);
-    QueryPerformanceCounter(&game->last_time);
 
+    game->frequency = SDL_GetPerformanceFrequency();
+    game->last_time = SDL_GetPerformanceCounter();
     game->camera = NULL;
     game->entities = NULL;
     game->map = NULL;
@@ -31,6 +31,7 @@ Game *game_create(void){
     game->solid_tile_ids.solid_tile_ids = NULL;
     game->custom_colliders = NULL;
     game->state_manager = NULL;
+    game->window = NULL;
     game->solid_tile_ids.tile_count = 0;
     game->delta_time = 0.0f;
     game->accumulator = 0.0f;
@@ -43,7 +44,7 @@ Game *game_create(void){
 
 bool manage_window_init(Game *game, float camera_x, float camera_y, float dead_zone_percentage){
     if(game == NULL) return false;
-    return init_window(&game->camera, &game->renderer, camera_x, camera_y, dead_zone_percentage);
+    return init_window(&game->camera, &game->renderer, &game->window, camera_x, camera_y, dead_zone_percentage);
 }
 
 bool manage_entities_init(Game *game){
@@ -56,9 +57,9 @@ bool manage_entities_add(Game *game, Entity* entity){
     return add_entity(&game->entities, entity);
 }
 
-bool manage_world_init(Game *game, const char *map_file, int tile_size, char *tile_ids, int tile_count){
+bool manage_world_init(Game *game, const char *map_file, int tile_size, char *tile_ids, int tile_count, SDL_Color tile_color){
     if(game == NULL) return false;
-    return init_world(&game->map, &game->solid_tile_ids, map_file, tile_size, tile_ids, tile_count);
+    return init_world(game->renderer->sdl_renderer, &game->map, &game->solid_tile_ids, map_file, tile_size, tile_ids, tile_count, tile_color);
 }
 
 bool manage_world_colliders_init(Game *game){
@@ -81,6 +82,7 @@ void game_destroy(Game *game){
     if (game->asset_manager != NULL) asset_manager_destroy(game->asset_manager);
     if (game->renderer != NULL) renderer_destroy(game->renderer);
     if (game->state_manager != NULL) state_manager_destroy(game->state_manager);
+    if (game->window != NULL) SDL_DestroyWindow(game->window);
 
     solid_tile_ids_destroy(&game->solid_tile_ids);
 
@@ -102,13 +104,12 @@ void game_draw(Game *game){
     if(game->renderer) renderer_present(game->renderer);
 }
 
-void game_loop(Game *game){
-    LARGE_INTEGER current_time;
-    QueryPerformanceCounter(&current_time);
-
-    long long elapsed_ticks = current_time.QuadPart - game->last_time.QuadPart;
-    float frame_time = (float) elapsed_ticks / (float) game->frequency.QuadPart;
+void game_loop(Game *game) {
+    Uint64 current_time = SDL_GetPerformanceCounter();
+    float frame_time = (float)(current_time - game->last_time) / (float)game->frequency;
     game->last_time = current_time;
+
+    if (frame_time > 0.25f) frame_time = 0.25f;
 
     game->accumulator += frame_time;
     
@@ -120,13 +121,12 @@ void game_loop(Game *game){
 
     game_draw(game);
 
-    LARGE_INTEGER end_time;
-    QueryPerformanceCounter(&end_time);
+    Uint64 end_time = SDL_GetPerformanceCounter();
+    float frame_process_time = (float)(end_time - current_time) / (float)game->frequency;
 
-    float frame_process_time = (float)(end_time.QuadPart - current_time.QuadPart) / (float)game->frequency.QuadPart;
     if (frame_process_time < TARGET_FRAME_TIME) {
         float sleep_time = TARGET_FRAME_TIME - frame_process_time;
-        Sleep((DWORD)(sleep_time * 1000.0f)); 
+        SDL_Delay((Uint32)(sleep_time * 1000.0f)); 
     }
 }
 
@@ -137,6 +137,7 @@ void game_run(Game *game){
     if(game->state_manager != NULL) state_manager_push(game->state_manager, playing_state_create(), game);
 
     while(game->is_running){
+        SDL_PumpEvents();
         keyboard_update(&game->keyboard);
         commands_update(&game->commands, &game->keyboard);
         game_loop(game);
