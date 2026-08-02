@@ -1,13 +1,13 @@
 #include "keyboard.h"
-#include <windows.h>
+#include <SDL3/SDL.h>
 
-static const int WINDOWS_VK_MAPPING[INPUT_KEY_COUNT] = { 
-    VK_ESCAPE,
-    VK_LEFT,
-    VK_RIGHT,
-    VK_UP,
-    VK_DOWN,
-    VK_RETURN
+static const SDL_Scancode SDL_KEY_MAPPING[INPUT_KEY_COUNT] = { 
+    SDL_SCANCODE_ESCAPE,
+    SDL_SCANCODE_LEFT,
+    SDL_SCANCODE_RIGHT,
+    SDL_SCANCODE_UP,
+    SDL_SCANCODE_DOWN,
+    SDL_SCANCODE_RETURN
 };
 
 void keyboard_init(InputKeyboardState *input) {
@@ -23,16 +23,18 @@ bool keyboard_is_key_pressed(InputKeyboardState *input, InputKey key){
     return input->keys[key] == KEY_STATE_PRESSED;
 }
 
-void keyboard_update(InputKeyboardState *input){
-    if(!input) return;
+void keyboard_update(InputKeyboardState *input) {
+    if (!input) return;
 
-    for(int i = 0; i < INPUT_KEY_COUNT; i++){
-        int vk_code = WINDOWS_VK_MAPPING[i];
+    const bool *state = SDL_GetKeyboardState(NULL);
+    if (!state) return;
 
-        if(GetAsyncKeyState(vk_code) & 0x8000){
+    for (int i = 0; i < INPUT_KEY_COUNT; i++) {
+        SDL_Scancode scancode = SDL_KEY_MAPPING[i];
+
+        if (state[scancode]) {
             input->keys[i] = KEY_STATE_PRESSED;
-        }
-        else{
+        } else {
             input->keys[i] = KEY_STATE_RELEASED;
         }
     }
