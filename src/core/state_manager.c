@@ -63,7 +63,7 @@ void state_manager_render(StateManager *state_manager, Game *game, Node *current
 
     if(state->render_lower_state && current_state->next != NULL) {
         state_manager_render(state_manager, game, current_state->next);
-        renderer_apply_dim(game->renderer, 2);
+        renderer_apply_dim(game->renderer, 0.5f);
     }
 
     state->render(game, state->state_data);
