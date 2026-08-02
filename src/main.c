@@ -41,7 +41,7 @@ int main() {
         return EXIT_FAILURE;
     }
 
-    if (manage_world_init(game, "tests/assets/test_tile_map03.txt", 32, tile_ids, 1, (SDL_Color){100, 100, 100, 255}) == false) {
+    if (manage_world_init(game, "tests/assets/test_tile_map03.txt", 32, tile_ids, 1, (SDL_Color){0, 0, 0, 255}) == false) {
         fprintf(stderr, "Erro ao inicializar World.\n");
         game_destroy(game);
         return EXIT_FAILURE;
