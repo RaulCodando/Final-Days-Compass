@@ -8,144 +8,75 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void test_renderer_create(){
-    Renderer *renderer = renderer_create(10, 10);
+Renderer *test_renderer_create(SDL_Window *window) {
+    Renderer *renderer = renderer_create(window, SCREEN_WIDTH, SCREEN_HEIGHT);
     assert(renderer != NULL);
-    assert(renderer->viewport_width == 10);
-    assert(renderer->viewport_height == 10);
-    assert(renderer->buffer != NULL);
+    printf("  [PASS] test_renderer_create\n");
+    return renderer;
+}
+
+void test_renderer_clear(Renderer *renderer) {
+    assert(renderer != NULL);
+    printf("  [PASS] test_renderer_clear\n");
+    renderer_clear(renderer);
+}
+
+void test_renderer_draw(Renderer *renderer) {
+    assert(renderer != NULL);
+    Sprite *sprite = sprite_create(renderer->sdl_renderer, "refactoring_tests/assets/test_sprite.png");
+    assert(sprite != NULL);
+    renderer_draw(renderer, 0, 0, sprite);
+    printf("  [PASS] test_renderer_draw\n");
+    sprite_destroy(sprite);
+}
+
+void test_renderer_draw_tile(Renderer *renderer) {
+    assert(renderer != NULL);
+    SDL_Color color = {255, 255, 255, 255};
+    TileSet *tileset = tileset_create(renderer->sdl_renderer, 16, 16, color);
+    assert(tileset != NULL);
+    renderer_draw_tile(renderer, 0, 0, 1, tileset);
+    SDL_Delay(500);
+    printf("  [PASS] test_renderer_draw_tile\n");
+    tileset_destroy(tileset);
+}
+
+void test_renderer_draw_map(Renderer *renderer) {
+    assert(renderer != NULL);
+    SDL_Color color = {255, 255, 255, 255};
+    Map *map = map_create_from_file(renderer->sdl_renderer, "refactoring_tests/assets/test_tile_map.txt", 16, color);
+    assert(map != NULL);
+    Camera *camera = camera_create(0.0f, 0.0f, 1.0f, 800, 600);
+    assert(camera != NULL);
+    renderer_draw_map(renderer, camera, map);
+    printf("  [PASS] test_renderer_draw_map\n");
+    camera_destroy(camera);
+
+    SDL_Delay(500);
+    map_destroy(map);
+}
+
+void test_renderer_present(Renderer *renderer) {
+    assert(renderer != NULL);
+    renderer_present(renderer);
+    printf("  [PASS] test_renderer_present\n");
+    SDL_Delay(3000);
+}
+
+void test_renderer() {
+    SDL_Init(SDL_INIT_VIDEO);
+    SDL_Window *window = SDL_CreateWindow("Test Renderer", 800, 600, 0);
+    assert(window != NULL);
+    
+    Renderer *renderer = test_renderer_create(window);
+    
+    test_renderer_clear(renderer);
+    test_renderer_draw(renderer);
+    test_renderer_draw_tile(renderer);
+    test_renderer_draw_map(renderer);
+    test_renderer_present(renderer);
     
     renderer_destroy(renderer);
-    printf("test_renderer_create passed.\n");
-}
-
-void test_renderer_draw(){
-    Renderer *renderer = renderer_create(10, 10);
-    Sprite *sprite = sprite_create("tests/assets/test_sprite02.txt");
-
-    assert(renderer != NULL);
-    assert(sprite != NULL);
-
-    renderer_draw(renderer, 5, 5, sprite);
-
-    assert(renderer->buffer[5 * renderer->viewport_width + 5].Char.AsciiChar == 'A');
-    assert(renderer->buffer[5 * renderer->viewport_width + 6].Char.AsciiChar == 'B');
-    assert(renderer->buffer[6 * renderer->viewport_width + 5].Char.AsciiChar == ' ');
-    assert(renderer->buffer[6 * renderer->viewport_width + 6].Char.AsciiChar == 'C');
-
-    renderer_draw(renderer, 9, 9, sprite);
-
-    renderer_destroy(renderer);
-    sprite_destroy(sprite);
-
-    printf("test_renderer_draw passed.\n");
-}
-
-void test_renderer_draw_tile(){
-    Renderer *renderer = renderer_create(10, 10);
-    TileSet *tileset = tileset_create(2, 2);
-
-    assert(renderer != NULL);
-    assert(tileset != NULL);
-
-    renderer_draw_tile(renderer, 5, 5, TEST_TILE03, tileset);
-
-    assert(renderer->buffer[5 * renderer->viewport_width + 5].Char.AsciiChar == 'A');
-    assert(renderer->buffer[5 * renderer->viewport_width + 6].Char.AsciiChar == 'B');
-    assert(renderer->buffer[6 * renderer->viewport_width + 5].Char.AsciiChar == 'C');
-    assert(renderer->buffer[6 * renderer->viewport_width + 6].Char.AsciiChar == 'D');
-
-    renderer_destroy(renderer);
-    tileset_destroy(tileset);
-
-    printf("test_renderer_draw_tile passed.\n");
-}
-
-void test_renderer_draw_map(){
-    Renderer *renderer = renderer_create(16, 16);
-    Camera *camera = camera_create(0.0f, 0.0f, 0.25f, 16, 16);
-    Map *map = map_create_from_file("tests/assets/test_tile_map02.txt", 4);
-
-    assert(renderer != NULL);
-    assert(camera != NULL);
-    assert(map != NULL);
-
-    renderer_draw_map(renderer, camera, map);
-
-    for(int i = 0; i < 16; i++){
-        for(int j = 0; j < 16; j++){
-            printf("%c", renderer->buffer[i * renderer->viewport_width + j].Char.AsciiChar);
-        }
-        printf("\n");
-    }
-
-    renderer_destroy(renderer);
-    camera_destroy(camera);
-    map_destroy(map);
-
-    printf("test_renderer_draw_map passed.\n");
-}
-
-void test_renderer_clear(){
-    Renderer *renderer = renderer_create(10, 10);
-    Sprite *sprite = sprite_create("tests/assets/test_sprite02.txt");
-
-    assert(renderer != NULL);
-    assert(sprite != NULL);
-
-    renderer_draw(renderer, 5, 5, sprite);
-
-    renderer_clear(renderer);
-
-    for(int i = 0; i < renderer->viewport_height; i++){
-        for(int j = 0; j < renderer->viewport_width; j++){
-            int index = i * renderer->viewport_width + j;
-            assert(renderer->buffer[index].Char.AsciiChar == BLANK_CHARACTER);
-        }
-    }
-
-    renderer_destroy(renderer);
-    sprite_destroy(sprite);
-
-    printf("test_renderer_clear passed.\n");
-}
-
-void test_renderer_present(){
-    Renderer *renderer = renderer_create(10, 10);
-    Sprite *sprite = sprite_create("tests/assets/test_sprite02.txt");
-
-    assert(renderer != NULL);
-    assert(sprite != NULL);
-
-    renderer_draw(renderer, 5, 5, sprite);
-
-    renderer_present(renderer);
-
-    renderer_destroy(renderer);
-    sprite_destroy(sprite);
-
-    printf("test_renderer_present passed.\n");
-}
-
-void test_renderer(){
-    test_renderer_create();
-    test_renderer_draw();
-    test_renderer_draw_tile();
-    test_renderer_clear();
-    test_renderer_draw_map();
-
-    printf("\nMap drawing test completed. Proceed to the next test? (y/n): ");
-    char response;
-    scanf(" %c", &response);
-    if(response != 'y' && response != 'Y'){
-        exit(0);
-    }
-    system("cls");
-    test_renderer_present();
-
-    printf("End of tests in 2 seconds...\n");
-    Sleep(2000);
-    system("cls");
-
-    printf("All renderer tests passed.\n");
+    SDL_DestroyWindow(window);
+    SDL_Quit();
 }
