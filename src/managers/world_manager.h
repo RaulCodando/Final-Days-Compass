@@ -2,13 +2,14 @@
 #define WORLD_MANAGER_H
 
 #include <stdbool.h>
+#include <SDL3/SDL.h>
 
 typedef struct Map Map;
 typedef struct SolidTileIDs SolidTileIDs;
 typedef struct Vector Vector;
 typedef struct Collider Collider;
 
-bool init_world(Map **map, SolidTileIDs *solid_tile_ids, const char *map_file, int tile_size, char *tile_ids, int tile_count);
+bool init_world(SDL_Renderer *renderer, Map **map, SolidTileIDs *solid_tile_ids, const char *map_file, int tile_size, char *tile_ids, int tile_count, SDL_Color tile_color);
 bool init_colliders(Vector **colliders);
 bool add_collider(Vector **colliders, float x, float y, float width, float height);
 
