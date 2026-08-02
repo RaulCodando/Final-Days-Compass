@@ -13,7 +13,6 @@ typedef enum TileIDs{
     TEST_TILE03,
     TEST_TILE04,
     TEST_TILE05,
-    TEST_TILE06,
     TILE_COUNT
 } TileIDs;
 
