@@ -1,23 +1,20 @@
-# Ignora tudo dentro da pasta build
 build/*
+SDL/*
+SDL_image/*
+SDL_ttf/*
 
-# Mas abre uma exceção para o arquivo .gitkeep não ser ignorado
 !build/.gitkeep
 
-# Ignora executáveis e objetos soltos se houver
 *.o
 *.exe
+*.dll
 tests/run_tests
 
-# --- Arquivos de Editores e IDEs ---
-.vscode/            # Configurações do VS Code (regras de build, extensões sugeridas)
-.idea/              # Configurações do CLion / Intelij
-*.suo               # Arquivos de solução do Visual Studio
-*.user              # Configurações de usuário locais
+.vscode/
+.idea/
+*.suo
+*.user
 
-# --- Arquivos do Sistema Operacional ---
-Thumbs.db           # Cache de miniaturas do Windows
-desktop.ini         # Configurações de exibição de pastas do Windows
-
-# --- Logs de Erro ---
-*.log               # Logs de erro que podem ser gerados por ferramentas
+Thumbs.db
+desktop.ini
+*.log

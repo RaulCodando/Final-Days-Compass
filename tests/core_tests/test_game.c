@@ -118,7 +118,7 @@ void test_game_run(void){
     }
 
     game_run(game);
-    FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE));
+    SDL_Quit();
     game_destroy(game);
     system("cls");
     printf("test_game_run passed.\n");

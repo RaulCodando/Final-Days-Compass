@@ -13,59 +13,60 @@
 #define MAX(a,b) (((a)>(b))?(a):(b))
 #define MIN(a,b) (((a)<(b))?(a):(b))
 
-Renderer *renderer_create(int width, int height){
-    Renderer *renderer = (Renderer*) malloc(sizeof(Renderer));
+Renderer *renderer_create(SDL_Window *window, int width, int height) {
+    if (window == NULL) {
+        fprintf(stderr, "Error: Invalid window provided to renderer_create.\n");
+        return NULL;
+    }
 
-    if(renderer == NULL){
-        fprintf(stderr, "Error: memory allocation failed.\n");
+    Renderer *renderer = (Renderer*) malloc(sizeof(Renderer));
+    if (renderer == NULL) {
+        fprintf(stderr, "Error: Memory allocation failed for Renderer struct.\n");
         return NULL;
     }
 
     renderer->viewport_width = width;
     renderer->viewport_height = height;
-    renderer->buffer = (CHAR_INFO*) malloc(sizeof(CHAR_INFO) * width * height);
 
-    if(renderer->buffer == NULL){
-        fprintf(stderr, "Error: memory allocation failed.\n");
+    renderer->sdl_renderer = SDL_CreateRenderer(window, NULL);
+
+    if (renderer->sdl_renderer == NULL) {
+        fprintf(stderr, "Error creating SDL_Renderer: %s\n", SDL_GetError());
         free(renderer);
         return NULL;
+    }
+
+    if (!TTF_Init()) {
+        fprintf(stderr, "Error initializing TTF: %s\n", SDL_GetError());
+    }
+
+    renderer->font = TTF_OpenFont("assets/fonts/silkscreen/slkscr.ttf", 8);
+    if (!renderer->font) {
+        fprintf(stderr, "Warning: Could not load default font: %s\n", SDL_GetError());
     }
 
     renderer_clear(renderer);
     return renderer;
 }
 
-void renderer_clear(Renderer *renderer){
-    int total_pixels = renderer->viewport_width * renderer->viewport_height;
-    for (int i = 0; i < total_pixels; i++){
-        renderer->buffer[i].Char.AsciiChar = BLANK_CHARACTER;
-        renderer->buffer[i].Attributes = FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY;
-    }
+void renderer_clear(Renderer *renderer) {
+    if (renderer == NULL || renderer->sdl_renderer == NULL) return;
+
+    SDL_SetRenderDrawColor(renderer->sdl_renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer->sdl_renderer);
 }
 
 void renderer_draw(Renderer *renderer, int x, int y, struct Sprite *sprite){
     if(!sprite || !renderer) return;
 
-    for(int i = 0; i < sprite->height; i++){
-        for(int j = 0; j < sprite->width; j++){
-            int target_x = x + j;
-            int target_y = y + i;
+    SDL_FRect dst_rect = {
+        .x = (float)x * RENDER_SCALE,
+        .y = (float)y * RENDER_SCALE,
+        .w = sprite->width * RENDER_SCALE,
+        .h = sprite->height * RENDER_SCALE
+    };
 
-            if(target_x >= 0 && target_x < renderer->viewport_width && target_y >=0 && target_y < renderer->viewport_height){
-                char pixel_char = sprite->pixels[i * sprite->width + j];
-                if(pixel_char != BLANK_CHARACTER && pixel_char != BLACK_COLOR){
-                    int index = target_y * renderer->viewport_width + target_x;
-                    renderer->buffer[index].Char.AsciiChar = pixel_char;
-                    renderer->buffer[index].Attributes = FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY;
-                }
-                else if(pixel_char == BLACK_COLOR){
-                    int index = target_y * renderer->viewport_width + target_x;
-                    renderer->buffer[index].Char.AsciiChar = ' ';
-                    renderer->buffer[index].Attributes = FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY;
-                }
-            }
-        }
-    }
+    SDL_RenderTexture(renderer->sdl_renderer, sprite->texture, NULL, &dst_rect);
 }
 
 void renderer_draw_tile(Renderer *renderer, int x, int y, enum TileIDs id, struct TileSet *tileset){
@@ -106,46 +107,40 @@ void renderer_draw_map(Renderer *renderer, struct Camera *camera, struct Map *ma
 }
 
 void renderer_present(Renderer *renderer){
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    COORD bufferSize = {(SHORT)renderer->viewport_width, (SHORT)renderer->viewport_height};
-    COORD bufferCoord = {0, 0};
-    SMALL_RECT writeRegion = {0, 0, (SHORT)(renderer->viewport_width - 1), (SHORT)(renderer->viewport_height - 1)};
-    WriteConsoleOutputA(hConsole, renderer->buffer, bufferSize, bufferCoord, &writeRegion);
+    SDL_RenderPresent(renderer->sdl_renderer);
 }
 
-void renderer_draw_debug_collider(Renderer *renderer, struct Collider *collider, int collider_x, int collider_y){
-    if(!collider || !renderer) return;
+void renderer_draw_debug_collider(Renderer *renderer, struct Collider *collider, int collider_x, int collider_y) {
+    if (!collider || !renderer) return;
 
-    for(int i = 0; i < collider->height; i++){
-        for(int j = 0; j < collider->width; j++){
-            int target_x = collider_x + j;
-            int target_y = collider_y + i;
+    SDL_FRect rect = {
+        .x = (float)collider_x * RENDER_SCALE,
+        .y = (float)collider_y * RENDER_SCALE,
+        .w = (float)collider->width * RENDER_SCALE,
+        .h = (float)collider->height * RENDER_SCALE
+    };
 
-            if(target_x >= 0 && target_x < renderer->viewport_width && target_y >=0 && target_y < renderer->viewport_height){
-                int index = target_y * renderer->viewport_width + target_x;
-                renderer->buffer[index].Char.AsciiChar = '?';
-                renderer->buffer[index].Attributes = FOREGROUND_RED | FOREGROUND_INTENSITY;
-            }
-        }
-    }
+    SDL_SetRenderDrawColor(renderer->sdl_renderer, 255, 0, 0, 255);
+    SDL_RenderRect(renderer->sdl_renderer, &rect);
 }
 
-void renderer_apply_dim(Renderer *renderer, int dim_amount) {
-    if (!renderer || !renderer->buffer) return;
+void renderer_apply_dim(Renderer *renderer, float alpha) {
+    if (!renderer) return;
 
-    int total_cells = renderer->viewport_width * renderer->viewport_height;
+    SDL_FRect rect = {
+        .x = 0.0f * RENDER_SCALE,
+        .y = 0.0f * RENDER_SCALE,
+        .w = (float)renderer->viewport_width * RENDER_SCALE,
+        .h = (float)renderer->viewport_height * RENDER_SCALE
+    };
 
-    for (int i = 0; i < total_cells; i++) {
-        WORD attr = renderer->buffer[i].Attributes;
+    SDL_SetRenderDrawBlendMode(renderer->sdl_renderer, SDL_BLENDMODE_BLEND);
 
-        if (dim_amount == 1) attr &= ~FOREGROUND_INTENSITY;
-        else if (dim_amount >= 2) {
-            attr &= ~(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
-            attr |= FOREGROUND_INTENSITY; 
-        }
+    if (alpha < 0.0f) alpha = 0.0f;
+    if (alpha > 1.0f) alpha = 1.0f;
 
-        renderer->buffer[i].Attributes = attr;
-    }
+    SDL_SetRenderDrawColor(renderer->sdl_renderer, 0, 0, 0, (Uint8)(alpha * 255.0f));
+    SDL_RenderFillRect(renderer->sdl_renderer, &rect);
 }
 
 void renderer_draw_hud_element(Renderer *renderer, struct HudElement *element) {
@@ -169,21 +164,28 @@ void renderer_draw_hud_element(Renderer *renderer, struct HudElement *element) {
 
         case HUD_TEXT: {
             HudTextElement *text_elem = element->data.text;
-            if (!text_elem || !text_elem->text) break;
+            if (!text_elem || !text_elem->text || !renderer->font) break;
 
-            int len = text_elem->width;
-            for (int i = 0; i < len; i++) {
-                int target_x = element->x + i;
-                int target_y = element->y;
+            SDL_Color color = {255, 255, 255, 255};
+            SDL_Surface *surface = TTF_RenderText_Solid(renderer->font, text_elem->text, 0, color);
+            if (!surface) break;
 
-                if (target_x >= 0 && target_x < renderer->viewport_width &&
-                    target_y >= 0 && target_y < renderer->viewport_height) {
-                    
-                    int index = target_y * renderer->viewport_width + target_x;
-                    renderer->buffer[index].Char.AsciiChar = text_elem->text[i];
-                    renderer->buffer[index].Attributes = FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
-                }
+            SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer->sdl_renderer, surface);
+            if (texture) {
+                SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
+
+                SDL_FRect dst_rect = {
+                    .x = (float)element->x * RENDER_SCALE,
+                    .y = (float)element->y * RENDER_SCALE,
+                    .w = (float)surface->w * RENDER_SCALE,
+                    .h = (float)surface->h * RENDER_SCALE
+                };
+
+                SDL_RenderTexture(renderer->sdl_renderer, texture, NULL, &dst_rect);
+                SDL_DestroyTexture(texture);
             }
+
+            SDL_DestroySurface(surface);
             break;
         }
 
@@ -200,8 +202,10 @@ void renderer_draw_hud_element(Renderer *renderer, struct HudElement *element) {
     }
 }
 
-void renderer_destroy(Renderer *renderer){
-    if (renderer == NULL) return;
-    free(renderer->buffer);
+void renderer_destroy(Renderer *renderer) {
+    if (!renderer) return;
+    if (renderer->font) TTF_CloseFont(renderer->font);
+    if (renderer->sdl_renderer) SDL_DestroyRenderer(renderer->sdl_renderer);
+    TTF_Quit();
     free(renderer);
 }

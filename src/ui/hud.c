@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
-HudElement *hud_create_text(const char *text, int x, int y, bool center_x, bool center_y){
+HudElement *hud_create_text(const char *text, int x, int y, bool center_x, bool center_y, TTF_Font *font){
     HudElement *element = (HudElement *)malloc(sizeof(HudElement));
     if (!element) {
         perror("Failed to allocate HudElement");
@@ -20,17 +20,24 @@ HudElement *hud_create_text(const char *text, int x, int y, bool center_x, bool 
         exit(EXIT_FAILURE);
     }
 
+    int exact_width = 0;
+    int exact_height = 0;
+
+    if(font){
+        TTF_GetStringSize(font, text, 0, &exact_width, &exact_height);
+    }
+
     element->data.text->text = text;
-    element->data.text->width = strlen(text);
+    element->data.text->width = exact_width;
     element->x = center_x ? (SCREEN_WIDTH - element->data.text->width) / 2 : x;
-    element->y = center_y ? (SCREEN_HEIGHT - 1) / 2 : y;
+    element->y = center_y ? (SCREEN_HEIGHT - exact_height) / 2 : y;
     element->center_x = center_x;
     element->center_y = center_y;
 
     return element;
 }
 
-HudElement *hud_create_icon(const char **sprite_paths, int state_count, int x, int y, bool center_x, bool center_y){
+HudElement *hud_create_icon(SDL_Renderer *renderer, const char **sprite_paths, int state_count, int x, int y, bool center_x, bool center_y){
     HudElement *element = (HudElement *)malloc(sizeof(HudElement));
     if (!element) {
         perror("Failed to allocate HudElement");
@@ -54,7 +61,7 @@ HudElement *hud_create_icon(const char **sprite_paths, int state_count, int x, i
     }
 
     for (int i = 0; i < state_count; i++) {
-        element->data.icon->sprites[i] = sprite_create(sprite_paths[i]);
+        element->data.icon->sprites[i] = sprite_create(renderer, sprite_paths[i]);
     }
 
     if (!element->data.icon->sprites[0]) {
@@ -82,7 +89,7 @@ HudElement *hud_create_icon(const char **sprite_paths, int state_count, int x, i
     return element;
 }
 
-HudElement *hud_create_container(const char **sprite_paths, int state_count, int x, int y, int width, int height, bool center_x, bool center_y) {
+HudElement *hud_create_container(SDL_Renderer *renderer, const char **sprite_paths, int state_count, int x, int y, int width, int height, bool center_x, bool center_y) {
     HudElement *element = (HudElement *)malloc(sizeof(HudElement));
     if (!element) {
         perror("Failed to allocate HudElement");
@@ -115,7 +122,7 @@ HudElement *hud_create_container(const char **sprite_paths, int state_count, int
         }
 
         for (int i = 0; i < state_count; i++) {
-            Sprite *sprite = sprite_create(sprite_paths[i]);
+            Sprite *sprite = sprite_create(renderer, sprite_paths[i]);
             element->data.container->sprites[i] = sprite;
         }
 
@@ -162,7 +169,7 @@ void hud_container_add_child(HudElement *container, HudElement *child){
                 : parent_x + child->x;
 
             child->y = child->center_y 
-                ? parent_y + (parent_h - 1) / 2 
+                ? parent_y + (parent_h - (int)FONT_SIZE) / 2 
                 : parent_y + child->y;
             break;
 

@@ -2,113 +2,80 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../core/settings.h"
+#include <SDL3_image/SDL_image.h>
 
-Sprite *sprite_create(const char *path){
-    FILE *file = fopen(path, "rb");
-    if (file == NULL){
-        fprintf(stderr, "Error: Could not open file %s\n", path);
+Sprite *sprite_create(SDL_Renderer *renderer, const char *path) {
+    if (renderer == NULL || path == NULL) {
+        fprintf(stderr, "Error: Invalid parameters passed to sprite_create.\n");
         return NULL;
     }
 
-    char line[256];
-
-    int width = 0;
-    int height = 0;
-
-    if(fgets(line, sizeof(line), file) != NULL){
-        if(sscanf(line, "%d %d", &width, &height) != 2){
-            fprintf(stderr, "Error: Invalid file format.\n");
-            fclose(file);
-            return NULL;
-        }
-    }
-
-    if(width <=0 || height <=0){
-        fprintf(stderr, "Error: Invalid dimensions.\n");
-        fclose(file);
+    SDL_Texture *texture = IMG_LoadTexture(renderer, path);
+    if (texture == NULL) {
+        fprintf(stderr, "Error: Could not load texture from %s: %s\n", path, SDL_GetError());
         return NULL;
     }
+
+    SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
 
     Sprite *sprite = (Sprite*) malloc(sizeof(Sprite));
-    if(sprite == NULL){
-        fprintf(stderr, "Error: memory allocation failed.\n");
-        fclose(file);
+    if (sprite == NULL) {
+        fprintf(stderr, "Error: Memory allocation failed for Sprite.\n");
+        SDL_DestroyTexture(texture);
         return NULL;
     }
 
-    sprite->height = height;
+    float width = 0.0f;
+    float height = 0.0f;
+    SDL_GetTextureSize(texture, &width, &height);
+
+    sprite->texture = texture;
     sprite->width = width;
-    size_t size = (size_t)width * (size_t)height;
-    
-    sprite->pixels = (char*) malloc(size * sizeof(char));
-    if(sprite->pixels == NULL){
-        fprintf(stderr, "Error: memory allocation failed for pixels\n");
-        free(sprite);
-        fclose(file);
-        return NULL;
-    }
-
-    for (int y = 0; y < height; y++) {
-        if (fgets(line, sizeof(line), file) == NULL) {
-            fprintf(stderr, "Error: Unexpected end of file.\n");
-            free(sprite->pixels);
-            free(sprite);
-            fclose(file);
-            return NULL;
-        }
-
-        int real_length = 0;
-        while(line[real_length] != '\0' && line[real_length] != '\n' && line[real_length] != '\r'){
-            real_length++;
-        }
-
-        for (int x = 0; x < width; x++) {
-            if(x < real_length){
-                sprite->pixels[y * width + x] = line[x];
-            }
-            else{
-                sprite->pixels[y * width + x] = BLANK_CHARACTER;
-            }
-        }
-    }
-
-    fclose(file);
-    return sprite;
-}
-
-Sprite *sprite_create_blank(int width, int height){
-    if(width <=0 || height <=0){
-        fprintf(stderr, "Error: Invalid dimensions.\n");
-        return NULL;
-    }
-
-    Sprite *sprite = (Sprite*) malloc(sizeof(Sprite));
-    if(sprite == NULL){
-        fprintf(stderr, "Error: memory allocation failed.\n");
-        return NULL;
-    }
-
     sprite->height = height;
-    sprite->width = width;
-    size_t size = (size_t)width * (size_t)height;
-    
-    sprite->pixels = (char*) malloc(size * sizeof(char));
-    if(sprite->pixels == NULL){
-        fprintf(stderr, "Error: memory allocation failed for pixels\n");
-        free(sprite);
-        return NULL;
-    }
-
-    for (size_t i = 0; i < size; i++) {
-        sprite->pixels[i] = BLANK_CHARACTER;
-    }
 
     return sprite;
 }
 
-void sprite_destroy(Sprite *sprite){
-    if(sprite != NULL){
-        free(sprite->pixels);
+Sprite *sprite_create_blank(SDL_Renderer *renderer, int width, int height, SDL_Color color) {
+    if (!renderer || width <= 0 || height <= 0) return NULL;
+
+    Sprite *sprite = (Sprite*) malloc(sizeof(Sprite));
+    if (!sprite) return NULL;
+
+    sprite->texture = SDL_CreateTexture(
+        renderer, 
+        SDL_PIXELFORMAT_RGBA8888, 
+        SDL_TEXTUREACCESS_TARGET, 
+        width, 
+        height
+    );
+
+    if (!sprite->texture) {
+        free(sprite);
+        return NULL;
+    }
+
+    sprite->width = (float)width;
+    sprite->height = (float)height;
+
+    Uint8 r, g, b, a;
+    SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a);
+
+    SDL_SetRenderTarget(renderer, sprite->texture);
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+    SDL_RenderClear(renderer);
+
+    SDL_SetRenderTarget(renderer, NULL);
+    SDL_SetRenderDrawColor(renderer, r, g, b, a);
+
+    return sprite;
+}
+
+void sprite_destroy(Sprite *sprite) {
+    if (sprite) {
+        if (sprite->texture) {
+            SDL_DestroyTexture(sprite->texture);
+        }
         free(sprite);
     }
 }

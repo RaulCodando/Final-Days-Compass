@@ -3,6 +3,7 @@
 #include "../ui/menu_hud.h"
 #include "../core/game.h"
 #include "../graphics/renderer.h"
+#include <SDL3/SDL.h>
 #include <stdlib.h>
 
 static void menu_state_enter(Game *game, void *state_data) {
@@ -10,7 +11,7 @@ static void menu_state_enter(Game *game, void *state_data) {
 
     MenuStateData *data = (MenuStateData *)state_data;
     if (data) {
-        data->menu_hud = menu_hud_create();
+        data->menu_hud = menu_hud_create(game->renderer->sdl_renderer, game->renderer->font);
         data->menu_state = MENU_NONE_SELECTED;
     }
 }

@@ -20,11 +20,11 @@ void asset_manager_destroy(AssetManager* asset_manager) {
     }
 }
 
-Sprite *asset_manager_get(AssetManager *asset_manager, ObjectIDs id, const char *filepath){
+Sprite *asset_manager_get(SDL_Renderer *renderer, AssetManager *asset_manager, ObjectIDs id, const char *filepath){
     if(!asset_manager || id >= OBJECT_COUNT) return NULL;
 
     if (asset_manager->object_sprites[id] == NULL) {
-        asset_manager->object_sprites[id] = sprite_create(filepath);
+        asset_manager->object_sprites[id] = sprite_create(renderer, filepath);
     }
     return asset_manager->object_sprites[id];
 }

@@ -1,52 +1,79 @@
 # --- BUILD CONFIGURATIONS ---
 CC = gcc
-# Added -D__USE_MINGW_ANSI_STDIO=1 to fix the %zu printf warnings on Windows
-CFLAGS = -Wall -Wextra -O2 -Isrc -Itests -D__USE_MINGW_ANSI_STDIO=1
+
+# --- SDL3, SDL_image & SDL_ttf CONFIGURATION ---
+SDL_DIR           = SDL/x86_64-w64-mingw32
+SDL_INCLUDE       = $(SDL_DIR)/include
+SDL_LIB           = $(SDL_DIR)/lib
+
+SDL_IMAGE_DIR     = SDL_image/x86_64-w64-mingw32
+SDL_IMAGE_INCLUDE = $(SDL_IMAGE_DIR)/include
+SDL_IMAGE_LIB     = $(SDL_IMAGE_DIR)/lib
+
+SDL_TTF_DIR       = SDL_ttf/x86_64-w64-mingw32
+SDL_TTF_INCLUDE   = $(SDL_TTF_DIR)/include
+SDL_TTF_LIB       = $(SDL_TTF_DIR)/lib
+
+LIBS = -lmingw32 -lSDL3_image -lSDL3_ttf -lSDL3
+
+CFLAGS  = -Wall -Wextra -O2 -Isrc -Itests -Irefactoring_tests -I$(SDL_INCLUDE) -I$(SDL_IMAGE_INCLUDE) -I$(SDL_TTF_INCLUDE)
+LDFLAGS = -L$(SDL_LIB) -L$(SDL_IMAGE_LIB) -L$(SDL_TTF_LIB) -mconsole
 
 # --- DIRECTORIES ---
-SRC_DIR = src
-TEST_DIR = tests
-BUILD_DIR = build
+SRC_DIR      = src
+TEST_DIR     = tests
+REFACTOR_DIR = refactoring_tests
+BUILD_DIR    = build
 
 # --- AUTOMATIC FILE MAPPING ---
-# Using native Make wildcard function (no $(shell ...)) to prevent CreateProcess errors
-SRC_SOURCES   := $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/*/*.c)
-TEST_SOURCES  := $(wildcard $(TEST_DIR)/*.c) $(wildcard $(TEST_DIR)/*/*.c)
+ALL_SRC_SOURCES := $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/*/*.c)
 
-# Removes utils_test.c from the main test list to avoid conflicts with main_test
-TEST_SOURCES  := $(filter-out $(TEST_DIR)/utils_test.c, $(TEST_SOURCES))
+# Remove a main.c do jogo da lista de fontes comuns para não gerar duplicidade no target test
+GAME_MAIN       := $(SRC_DIR)/main.c
+CORE_SRC_SOURCES:= $(filter-out $(GAME_MAIN), $(ALL_SRC_SOURCES))
 
-# Transforms .c file paths into equivalent .o paths inside build/
-SRC_OBJS      := $(patsubst %.c, $(BUILD_DIR)/%.o, $(notdir $(SRC_SOURCES)))
-TEST_OBJS     := $(patsubst %.c, $(BUILD_DIR)/%.o, $(notdir $(TEST_SOURCES)))
+TEST_SOURCES    := $(wildcard $(TEST_DIR)/*.c) $(wildcard $(TEST_DIR)/*/*.c)
+TEST_SOURCES    := $(filter-out $(TEST_DIR)/utils_test.c, $(TEST_SOURCES))
+
+# Mapeia os objetos
+CORE_SRC_OBJS   := $(patsubst %.c, $(BUILD_DIR)/%.o, $(notdir $(CORE_SRC_SOURCES)))
+GAME_MAIN_OBJ   := $(BUILD_DIR)/main.o
+TEST_OBJS       := $(patsubst %.c, $(BUILD_DIR)/%.o, $(notdir $(TEST_SOURCES)))
 
 # --- SEARCH DIRECTORIES (VPATH) ---
-# Hardcoded subdirectories to avoid breaking on Windows CMD with Linux 'find'
-VPATH = $(SRC_DIR):$(SRC_DIR)/graphics:$(SRC_DIR)/core:$(SRC_DIR)/input:$(SRC_DIR)/world:$(SRC_DIR)/objects:$(SRC_DIR)/physics:$(SRC_DIR)/utils:$(SRC_DIR)/persistence:$(SRC_DIR)/managers:$(SRC_DIR)/entity_behaviors:$(SRC_DIR)/game_states:$(SRC_DIR)/ui:$(SRC_DIR)/entities:$(TEST_DIR):$(TEST_DIR)/graphics_tests:$(TEST_DIR)/physics_tests:$(TEST_DIR)/core_tests:$(TEST_DIR)/input_tests:$(TEST_DIR)/world_tests:$(TEST_DIR)/objects_tests:$(TEST_DIR)/utils:$(TEST_DIR)/managers_tests
+VPATH = $(SRC_DIR):$(SRC_DIR)/graphics:$(SRC_DIR)/core:$(SRC_DIR)/input:$(SRC_DIR)/world:$(SRC_DIR)/objects:$(SRC_DIR)/physics:$(SRC_DIR)/utils:$(SRC_DIR)/persistence:$(SRC_DIR)/managers:$(SRC_DIR)/entity_behaviors:$(SRC_DIR)/game_states:$(SRC_DIR)/ui:$(SRC_DIR)/entities:$(TEST_DIR):$(TEST_DIR)/graphics_tests:$(TEST_DIR)/physics_tests:$(TEST_DIR)/core_tests:$(TEST_DIR)/input_tests:$(TEST_DIR)/world_tests:$(TEST_DIR)/objects_tests:$(TEST_DIR)/utils:$(TEST_DIR)/managers_tests:$(REFACTOR_DIR):$(REFACTOR_DIR)/graphics_tests
 
 # --- MAIN RULES ---
-.PHONY: all test test_utils clean
+.PHONY: all default test test_utils test_refactored_files clean
 
-all: test
+all: default
 
-# Main Game Tests Target
-test: $(SRC_OBJS) $(TEST_OBJS)
-	$(CC) -o $(TEST_DIR)/run_tests $^
+# Main Game (Linka as fontes do core + a main.o do jogo principal)
+default: $(CORE_SRC_OBJS) $(GAME_MAIN_OBJ)
+	$(CC) -o game $^ $(LDFLAGS) $(LIBS)
+
+# Main Game Tests Target (Linka apenas o core sem a main.o do jogo + os testes)
+test: $(CORE_SRC_OBJS) $(TEST_OBJS)
+	$(CC) -o $(TEST_DIR)/run_tests $^ $(LDFLAGS) $(LIBS)
 
 # Isolated Target for Utility Tests (Vector)
 test_utils: $(BUILD_DIR)/utils_test.o $(BUILD_DIR)/utils.o $(BUILD_DIR)/vector.o
-	$(CC) -o $(TEST_DIR)/run_utils_tests $^
+	$(CC) -o $(TEST_DIR)/run_utils_tests $^ $(LDFLAGS) $(LIBS)
+
+# Isolated Target for testing the refactored sprite
+test_refactored_files: $(BUILD_DIR)/test_refactored_sprite.o $(BUILD_DIR)/sprite.o $(BUILD_DIR)/main_refactoring_tests.o $(BUILD_DIR)/test_refactored_renderer.o $(BUILD_DIR)/renderer.o $(BUILD_DIR)/map.o $(BUILD_DIR)/tiles.o $(BUILD_DIR)/camera.o $(BUILD_DIR)/hud.o
+	$(CC) -o $(REFACTOR_DIR)/run_refactored_files_test $^ $(LDFLAGS) $(LIBS)
 
 # --- PATTERN RULES ---
 $(BUILD_DIR)/%.o: %.c
-	@if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
+	@mkdir -p $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # --- CLEANUP ---
 clean:
-	@if exist $(BUILD_DIR)\*.o del /q $(BUILD_DIR)\*.o
-	@if exist $(BUILD_DIR)\*.exe del /q $(BUILD_DIR)\*.exe
-	@if exist $(TEST_DIR)\run_tests del /q $(TEST_DIR)\run_tests
-	@if exist $(TEST_DIR)\run_tests.exe del /q $(TEST_DIR)\run_tests.exe
-	@if exist $(TEST_DIR)\run_utils_tests del /q $(TEST_DIR)\run_utils_tests
-	@if exist $(TEST_DIR)\run_utils_tests.exe del /q $(TEST_DIR)\run_utils_tests.exe
+	@rm -f $(BUILD_DIR)/*.o
+	@rm -f $(BUILD_DIR)/*.exe
+	@rm -f game game.exe
+	@rm -f $(TEST_DIR)/run_tests $(TEST_DIR)/run_tests.exe
+	@rm -f $(TEST_DIR)/run_utils_tests $(TEST_DIR)/run_utils_tests.exe
+	@rm -f $(REFACTOR_DIR)/run_refactored_files_test $(REFACTOR_DIR)/run_refactored_files_test.exe

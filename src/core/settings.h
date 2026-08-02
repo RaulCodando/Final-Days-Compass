@@ -1,12 +1,12 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
-#define BLANK_CHARACTER ' '
-#define BLACK_COLOR '_'
-#define SCREEN_WIDTH 80
-#define SCREEN_HEIGHT 32
+#define RENDER_SCALE 4.0f
+#define FONT_SIZE 8.0F
+#define SCREEN_WIDTH 320
+#define SCREEN_HEIGHT 180
 #define TARGET_FPS 30
 #define TARGET_FRAME_TIME (1.0f / TARGET_FPS)
 #define FIXED_TIME_STEP (1.0f / 60.0f)
 
-#endif /* SETTINGS_H */
+#endif // SETTINGS_H
