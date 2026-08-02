@@ -7,7 +7,6 @@
 #include "../ui/hud.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include <windows.h>
 #include <math.h>
 
 #define MAX(a,b) (((a)>(b))?(a):(b))
@@ -45,6 +44,14 @@ Renderer *renderer_create(SDL_Window *window, int width, int height) {
         fprintf(stderr, "Warning: Could not load default font: %s\n", SDL_GetError());
     }
 
+    SDL_Rect clip = {
+        .x = 0,
+        .y = 0,
+        .w = (int)(renderer->viewport_width  * RENDER_SCALE),
+        .h = (int)(renderer->viewport_height * RENDER_SCALE)
+    };
+    SDL_SetRenderClipRect(renderer->sdl_renderer, &clip);
+
     renderer_clear(renderer);
     return renderer;
 }
@@ -80,8 +87,8 @@ void renderer_draw_tile(Renderer *renderer, int x, int y, enum TileIDs id, struc
 void renderer_draw_map(Renderer *renderer, struct Camera *camera, struct Map *map){
     if(!map || !renderer || !camera) return;
 
-    int start_j = (int)(camera->x) / map->tile_size;
-    int start_i = (int)(camera->y) / map->tile_size;
+    int start_j = (int)floorf((camera->x) / map->tile_size);
+    int start_i = (int)floorf((camera->y) / map->tile_size);
 
     start_j = MAX(0, start_j);
     start_i = MAX(0, start_i);
