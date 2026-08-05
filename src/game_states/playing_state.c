@@ -2,12 +2,20 @@
 #include "menu_state.h"
 #include "../core/game.h"
 #include "../input/commands.h"
-#include "../entity_behaviors/generic_entity_behaviors.h"
+#include "../objects/entity.h"
+#include "../objects/scenery_element.h"
 #include "../core/state_manager.h"
 #include <stdlib.h>
 #include <math.h>
 
+int compare_renderables(const void *a, const void *b) {
+    const RenderableObject *itemA = *(const RenderableObject **)a;
+    const RenderableObject *itemB = *(const RenderableObject **)b;
 
+    if (itemA->y_anchor < itemB->y_anchor) return -1;
+    if (itemA->y_anchor > itemB->y_anchor) return 1;
+    return 0;
+}
 
 static void playing_state_enter(Game *game, void *state_data){
     
@@ -56,18 +64,64 @@ static void playing_state_render(Game *game, void *state_data){
     if(!game || !game->entities) return;
 
     if (game->map != NULL) {
-        renderer_draw_map(game->renderer, game->camera, game->map);
+        renderer_draw_map(game->renderer, game->camera, game->map, 0);
     }
+
+    size_t max_renderables = game->entities->size + game->scenery_elements->size;
+    if (max_renderables == 0) return;
+
+    RenderableObject *renderables[max_renderables];
+    size_t current_renderable = 0;
 
     for(size_t i = 0; i < game->entities->size; i++){
         Entity *entity = (Entity*)vector_get(game->entities, i);
         if (!entity) continue;
-        
-        int entity_screen_x = (int) floorf(entity->x_pos - game->camera->x);
-        int entity_screen_y = (int) floorf(entity->y_pos - game->camera->y);
 
-        renderer_draw(game->renderer, entity_screen_x, entity_screen_y, entity->base.sprite);
+        float y_anchor = entity_get_y_anchor(entity);
+        renderables[current_renderable] = renderable_object_create(RENDERABLE_ENTITY, entity, y_anchor);
+        current_renderable++;
     }
+
+    for(size_t i = 0; i < game->scenery_elements->size; i++){
+        SceneryElement *scenery_element = (SceneryElement*)vector_get(game->scenery_elements, i);
+        if (!scenery_element) continue;
+
+        float y_anchor = scenery_element_get_y_anchor(scenery_element);
+        renderables[current_renderable] = renderable_object_create(RENDERABLE_SCENERY_ELEMENT, scenery_element, y_anchor);
+        current_renderable++;
+    }
+
+    qsort(renderables, current_renderable, sizeof(RenderableObject*), compare_renderables);
+
+    for(size_t i = 0; i < current_renderable; i++){
+        Sprite *sprite = NULL;
+        float x = 0;
+        float y = 0;
+
+        if(renderables[i]->type == RENDERABLE_ENTITY) {
+            Entity *entity = (Entity*)renderables[i]->object;
+            sprite = entity->base.sprite;
+            x = entity->x_pos;
+            y = entity->y_pos;
+        }
+        else if(renderables[i]->type == RENDERABLE_SCENERY_ELEMENT) {
+            SceneryElement *scenery_element = (SceneryElement*)renderables[i]->object;
+            sprite = scenery_element->base.sprite;
+            x = scenery_element->x_pos;
+            y = scenery_element->y_pos;
+        }
+
+        int renderable_screen_x = (int) floorf(x - game->camera->x);
+        int renderable_screen_y = (int) floorf(y - game->camera->y);
+
+        if(sprite != NULL) {
+            renderer_draw(game->renderer, renderable_screen_x, renderable_screen_y, sprite);
+        }
+
+        renderable_object_destroy(renderables[i]);
+    }
+
+    renderer_draw_map(game->renderer, game->camera, game->map, 1);
 }
 
 GameState *playing_state_create(){
