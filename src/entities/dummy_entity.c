@@ -1,9 +1,15 @@
 #include "dummy_entity.h"
 #include "../core/game.h"
 #include "../objects/entity.h"
-#include "../entity_behaviors/test_entity_behavior.h"
-#include "../objects/asset_manager.h"
+#include "../asset_manager/asset_manager.h"
 #include "../graphics/sprite.h"
+
+static void test_entity_behavior_update(Entity *self, Game *game){
+    if(!self || !game) return;
+
+    self->vel_x = 4.0f * self->speed * game->delta_time;
+    entity_move_and_collide(self, game->map, &game->solid_tile_ids, game->custom_colliders, game->entities);
+}
 
 bool test_entity_spawn(Game *game, float x, float y){
     if(!game) return false;
