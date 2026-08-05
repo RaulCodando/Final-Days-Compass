@@ -2,6 +2,7 @@
 #include "../world/map.h"
 #include "../physics/collision.h"
 #include "../utils/vector.h"
+#include "../objects/scenery_element.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -19,13 +20,6 @@ bool init_world(SDL_Renderer *renderer, Map **map, SolidTileIDs *solid_tile_ids,
     return true;
 }
 
-bool init_colliders(Vector **colliders){
-    if (!colliders) return false;
-    *colliders = vector_create();
-    if(!*colliders) return false;
-    return true;
-}
-
 bool add_collider(Vector **colliders, float x, float y, float width, float height){
     if(!colliders || !(*colliders)) return false;
     Collider *collider = collider_create(x, y, width, height);
@@ -34,5 +28,16 @@ bool add_collider(Vector **colliders, float x, float y, float width, float heigh
         collider_destroy(collider);
         return false;
     }
+    return true;
+}
+
+bool add_scenery_element(Vector **scenery_elements, SceneryElement *scenery_element){
+    if(!scenery_elements || !(*scenery_elements) || !scenery_element) return false;
+    
+    if(!vector_push(*scenery_elements, scenery_element)){
+        scenery_element_destroy(scenery_element);
+        return false;
+    }
+    
     return true;
 }
