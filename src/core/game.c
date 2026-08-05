@@ -1,13 +1,11 @@
 #include "game.h"
 #include "state_manager.h"
 #include "../graphics/sprite.h"
-#include "../objects/asset_manager.h"
 #include "../managers/window_manager.h"
 #include "../managers/entity_manager.h"
 #include "../managers/world_manager.h"
-#include "../entity_behaviors/generic_entity_behaviors.h"
-#include "../entity_behaviors/player_behavior.h"
 #include "../game_states/playing_state.h"
+#include "../objects/scenery_element.h"
 #include "../utils/stack.h"
 #include "../ui/hud.h"
 #include "settings.h"
@@ -22,22 +20,23 @@ Game *game_create(void){
     keyboard_init(&game->keyboard);
     commands_init(&game->commands);
 
-    game->frequency = SDL_GetPerformanceFrequency();
-    game->last_time = SDL_GetPerformanceCounter();
     game->camera = NULL;
-    game->entities = NULL;
     game->map = NULL;
     game->renderer = NULL;
     game->solid_tile_ids.solid_tile_ids = NULL;
-    game->custom_colliders = NULL;
     game->state_manager = NULL;
     game->window = NULL;
     game->solid_tile_ids.tile_count = 0;
     game->delta_time = 0.0f;
     game->accumulator = 0.0f;
     game->is_running = false;
+    game->frequency = SDL_GetPerformanceFrequency();
+    game->last_time = SDL_GetPerformanceCounter();
     game->state_manager = state_manager_create();
     game->asset_manager = asset_manager_create();
+    game->entities = vector_create();
+    game->custom_colliders = vector_create();
+    game->scenery_elements = vector_create();
     
     return game;
 }
@@ -45,11 +44,6 @@ Game *game_create(void){
 bool manage_window_init(Game *game, float camera_x, float camera_y, float dead_zone_percentage){
     if(game == NULL) return false;
     return init_window(&game->camera, &game->renderer, &game->window, camera_x, camera_y, dead_zone_percentage);
-}
-
-bool manage_entities_init(Game *game){
-    if(game == NULL) return false;    
-    return init_entities(&game->entities);
 }
 
 bool manage_entities_add(Game *game, Entity* entity){
@@ -62,14 +56,14 @@ bool manage_world_init(Game *game, const char *map_file, int tile_size, char *ti
     return init_world(game->renderer->sdl_renderer, &game->map, &game->solid_tile_ids, map_file, tile_size, tile_ids, tile_count, tile_color);
 }
 
-bool manage_world_colliders_init(Game *game){
-    if(game == NULL) return false;
-    return init_colliders(&game->custom_colliders);
-}
-
 bool manage_world_colliders_add(Game *game, float x, float y, float width, float height){
     if(game == NULL) return false;
     return add_collider(&game->custom_colliders, x, y, width, height);
+}
+
+bool manage_world_scenery_elements_add(Game *game, SceneryElement *scenery_element){
+    if(game == NULL) return false;
+    return add_scenery_element(&game->scenery_elements, scenery_element);
 }
 
 void game_destroy(Game *game){
@@ -77,6 +71,7 @@ void game_destroy(Game *game){
 
     if (game->entities != NULL) vector_destroy(game->entities, (destroy_data_func)entity_destroy);
     if (game->custom_colliders != NULL) vector_destroy(game->custom_colliders, (destroy_data_func)collider_destroy);
+    if (game->scenery_elements != NULL) vector_destroy(game->scenery_elements, (destroy_data_func)scenery_element_destroy);
     if (game->map != NULL) map_destroy(game->map);
     if (game->camera != NULL) camera_destroy(game->camera);
     if (game->asset_manager != NULL) asset_manager_destroy(game->asset_manager);
