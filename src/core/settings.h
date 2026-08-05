@@ -3,6 +3,7 @@
 
 #define RENDER_SCALE 4.0f
 #define FONT_SIZE 8.0F
+#define TILE_SIZE 16
 #define SCREEN_WIDTH 480
 #define SCREEN_HEIGHT 270
 #define TARGET_FPS 30
