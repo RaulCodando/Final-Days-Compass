@@ -11,7 +11,6 @@ typedef struct Game Game;
 typedef enum ObjectIDs ObjectIDs;
 typedef void (*behavior_update)(Entity* self, Game *game_context);
 
-bool init_entities(Vector **game_entities);
 bool add_entity(Vector **game_entities, Entity *entity);
 
 #endif // ENTITY_MANAGER_H
