@@ -56,6 +56,16 @@ Renderer *renderer_create(SDL_Window *window, int width, int height) {
     return renderer;
 }
 
+RenderableObject *renderable_object_create(RenderableType type, void *object, float y_anchor){
+    RenderableObject *renderable_object = (RenderableObject *) malloc(sizeof(RenderableObject));
+    if(!renderable_object || !object) return NULL;
+
+    renderable_object->type = type;
+    renderable_object->object = object;
+    renderable_object->y_anchor = y_anchor;
+    return renderable_object;
+}
+
 void renderer_clear(Renderer *renderer) {
     if (renderer == NULL || renderer->sdl_renderer == NULL) return;
 
@@ -84,7 +94,7 @@ void renderer_draw_tile(Renderer *renderer, int x, int y, enum TileIDs id, struc
     renderer_draw(renderer, x, y, sprite);
 }
 
-void renderer_draw_map(Renderer *renderer, struct Camera *camera, struct Map *map){
+void renderer_draw_map(Renderer *renderer, struct Camera *camera, struct Map *map, int layer){
     if(!map || !renderer || !camera) return;
 
     int start_j = (int)floorf((camera->x) / map->tile_size);
@@ -107,8 +117,8 @@ void renderer_draw_map(Renderer *renderer, struct Camera *camera, struct Map *ma
             int target_x = (int) floorf((j * map->tile_size) - camera->x);
             int target_y = (int) floorf((i * map->tile_size) - camera->y);
 
-            TileIDs current_tile = map_get_tile_id(map, j, i);
-            renderer_draw_tile(renderer, target_x, target_y, current_tile, map->tileset);
+            TileIDs current_tile = map_get_tile_id(map, j, i, layer);
+            if(current_tile != BLANK_TILE) renderer_draw_tile(renderer, target_x, target_y, current_tile, map->tileset);
         }
     }
 }
@@ -207,6 +217,11 @@ void renderer_draw_hud_element(Renderer *renderer, struct HudElement *element) {
             break;
         }
     }
+}
+
+void renderable_object_destroy(RenderableObject *renderable_object){
+    if(!renderable_object) return;
+    free(renderable_object);
 }
 
 void renderer_destroy(Renderer *renderer) {
