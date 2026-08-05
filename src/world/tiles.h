@@ -13,6 +13,9 @@ typedef enum TileIDs{
     TEST_TILE03,
     TEST_TILE04,
     TEST_TILE05,
+    GRASS_TILE,
+    WATER_TILE,
+    LEAVES_TILE,
     TILE_COUNT
 } TileIDs;
 
