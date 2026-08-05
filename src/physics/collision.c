@@ -64,16 +64,18 @@ void resolve_map_collision(Collider* collider, float* vel_x, float* vel_y, Map* 
 
         for(int y = start_y; y <= end_y; y++){
             for(int x = start_x; x <= end_x; x++){
-                TileIDs current_tile_id = map_get_tile_id(map, x, y);
-                if(is_tile_solid(current_tile_id, solid_tile_ids)){
-                    if(*vel_x > 0.0f){
-                        collider->x = x * map->tile_size - collider->width;
+                for(int l = 0; l < map->layers; l++){
+                    TileIDs current_tile_id = map_get_tile_id(map, x, y, l);
+                    if(is_tile_solid(current_tile_id, solid_tile_ids)){
+                        if(*vel_x > 0.0f){
+                            collider->x = x * map->tile_size - collider->width;
+                        }
+                        else if (*vel_x < 0.0f){
+                            collider->x = x * map->tile_size + map->tile_size;
+                        }
+                        *vel_x = 0.0f;
+                        break;
                     }
-                    else if (*vel_x < 0.0f){
-                        collider->x = x * map->tile_size + map->tile_size;
-                    }
-                    *vel_x = 0.0f;
-                    break;
                 }
             }
         }
@@ -88,16 +90,18 @@ void resolve_map_collision(Collider* collider, float* vel_x, float* vel_y, Map* 
 
         for(int y = start_y; y <= end_y; y++){
             for(int x = start_x; x <= end_x; x++){
-                TileIDs current_tile_id = map_get_tile_id(map, x, y);
-                if(is_tile_solid(current_tile_id, solid_tile_ids)){
-                    if(*vel_y > 0.0f){
-                        collider->y = y * map->tile_size - collider->height;
+                for(int l = 0; l < map->layers; l++){
+                    TileIDs current_tile_id = map_get_tile_id(map, x, y, l);
+                    if(is_tile_solid(current_tile_id, solid_tile_ids)){
+                        if(*vel_y > 0.0f){
+                            collider->y = y * map->tile_size - collider->height;
+                        }
+                        else if (*vel_y < 0.0f){
+                            collider->y = y * map->tile_size + map->tile_size;
+                        }
+                        *vel_y = 0.0f;
+                        break;
                     }
-                    else if (*vel_y < 0.0f){
-                        collider->y = y * map->tile_size + map->tile_size;
-                    }
-                    *vel_y = 0.0f;
-                    break;
                 }
             }
         }
