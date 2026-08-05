@@ -40,7 +40,7 @@ GAME_MAIN_OBJ   := $(BUILD_DIR)/main.o
 TEST_OBJS       := $(patsubst %.c, $(BUILD_DIR)/%.o, $(notdir $(TEST_SOURCES)))
 
 # --- SEARCH DIRECTORIES (VPATH) ---
-VPATH = $(SRC_DIR):$(SRC_DIR)/graphics:$(SRC_DIR)/core:$(SRC_DIR)/input:$(SRC_DIR)/world:$(SRC_DIR)/objects:$(SRC_DIR)/physics:$(SRC_DIR)/utils:$(SRC_DIR)/persistence:$(SRC_DIR)/managers:$(SRC_DIR)/entity_behaviors:$(SRC_DIR)/game_states:$(SRC_DIR)/ui:$(SRC_DIR)/entities:$(TEST_DIR):$(TEST_DIR)/graphics_tests:$(TEST_DIR)/physics_tests:$(TEST_DIR)/core_tests:$(TEST_DIR)/input_tests:$(TEST_DIR)/world_tests:$(TEST_DIR)/objects_tests:$(TEST_DIR)/utils:$(TEST_DIR)/managers_tests
+VPATH = $(SRC_DIR):$(SRC_DIR)/graphics:$(SRC_DIR)/core:$(SRC_DIR)/input:$(SRC_DIR)/world:$(SRC_DIR)/objects:$(SRC_DIR)/physics:$(SRC_DIR)/utils:$(SRC_DIR)/persistence:$(SRC_DIR)/managers:$(SRC_DIR)/game_states:$(SRC_DIR)/ui:$(SRC_DIR)/entities:$(SRC_DIR)/asset_manager:$(SRC_DIR)/scenery_elements:$(TEST_DIR):$(TEST_DIR)/graphics_tests:$(TEST_DIR)/physics_tests:$(TEST_DIR)/core_tests:$(TEST_DIR)/input_tests:$(TEST_DIR)/world_tests:$(TEST_DIR)/objects_tests:$(TEST_DIR)/utils:$(TEST_DIR)/managers_tests
 
 # --- MAIN RULES ---
 .PHONY: all default test test_utils clean
