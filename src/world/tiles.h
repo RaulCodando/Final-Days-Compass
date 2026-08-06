@@ -8,11 +8,6 @@ typedef struct Renderer Renderer;
 
 typedef enum TileIDs{
     BLANK_TILE,
-    TEST_TILE01,
-    TEST_TILE02,
-    TEST_TILE03,
-    TEST_TILE04,
-    TEST_TILE05,
     GRASS_TILE,
     WATER_TILE,
     LEAVES_TILE,

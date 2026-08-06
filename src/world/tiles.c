@@ -10,14 +10,9 @@ TileSet *tileset_create(SDL_Renderer *renderer,int width, int height, SDL_Color 
     }
 
     tileset->sprites[0] = sprite_create_blank(renderer, width, height, color);
-    tileset->sprites[1] = sprite_create(renderer, "tests/assets/test_tile_sprite01.png");
-    tileset->sprites[2] = sprite_create(renderer, "tests/assets/test_tile_sprite02.png");
-    tileset->sprites[3] = sprite_create(renderer, "tests/assets/test_tile_sprite03.png");
-    tileset->sprites[4] = sprite_create(renderer, "tests/assets/test_tile_sprite04.png");
-    tileset->sprites[5] = sprite_create(renderer, "tests/assets/test_tile_sprite05.png");
-    tileset->sprites[6] = sprite_create(renderer, "assets/sprites/tile_sprites/GrassTile.png");
-    tileset->sprites[7] = sprite_create(renderer, "assets/sprites/tile_sprites/WaterTile.png");
-    tileset->sprites[8] = sprite_create(renderer, "assets/sprites/tile_sprites/LeavesTile.png");
+    tileset->sprites[1] = sprite_create(renderer, "assets/sprites/tile_sprites/GrassTile.png");
+    tileset->sprites[2] = sprite_create(renderer, "assets/sprites/tile_sprites/WaterTile.png");
+    tileset->sprites[3] = sprite_create(renderer, "assets/sprites/tile_sprites/LeavesTile.png");
 
     for(int i = 0; i < TILE_COUNT; i++) {
         if(!tileset->sprites[i]){
