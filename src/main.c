@@ -14,7 +14,7 @@ int main() {
         return EXIT_FAILURE;
     }
 
-    static char tile_ids[1] = {(char) 7};
+    static char tile_ids[1] = {(char) 2};
 
     if (manage_window_init(game, 0.0f, 0.0f, 0.25f) == false) {
         fprintf(stderr, "Erro ao inicializar Window.\n");
