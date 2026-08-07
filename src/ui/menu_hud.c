@@ -6,10 +6,10 @@
 #include "../core/settings.h"
 
 HudElement *menu_hud_create(SDL_Renderer *renderer, TTF_Font *font) {
-    const char *sprite_paths01[1] = {"tests/assets/test_menu_hud_container_sprite.png"};
+    const char *sprite_paths01[1] = {"assets/sprites/hud_sprites/menu_hud_container_sprite.png"};
     const char *sprite_paths02[2] = {
-        "tests/assets/test_hud_container_sprite.png",
-        "tests/assets/test_hud_selected_container_sprite.png"
+        "assets/sprites/hud_sprites/hud_container_sprite.png",
+        "assets/sprites/hud_sprites/hud_selected_container_sprite.png"
     };
 
     HudElement *main_container = hud_create_container(renderer, sprite_paths01, 1, 0, 0, 40, 20, true, true);
