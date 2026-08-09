@@ -23,6 +23,19 @@ LDFLAGS = -L$(SDL_LIB) -L$(SDL_IMAGE_LIB) -L$(SDL_TTF_LIB) -mconsole
 SRC_DIR      = src
 BUILD_DIR    = build
 
+# --- PLATFORM COMMANDS ---
+ifeq ($(OS),Windows_NT)
+	MKDIR_CMD = if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
+	CLEAN_OBJS = if exist $(BUILD_DIR)\*.o del /Q /F $(BUILD_DIR)\*.o
+	CLEAN_EXES = if exist $(BUILD_DIR)\*.exe del /Q /F $(BUILD_DIR)\*.exe
+	CLEAN_GAME = if exist game.exe del /Q /F game.exe
+else
+	MKDIR_CMD = mkdir -p $(BUILD_DIR)
+	CLEAN_OBJS = rm -f $(BUILD_DIR)/*.o
+	CLEAN_EXES = rm -f $(BUILD_DIR)/*.exe
+	CLEAN_GAME = rm -f game game.exe
+endif
+
 # --- AUTOMATIC FILE MAPPING ---
 ALL_SRC_SOURCES := $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/*/*.c)
 
@@ -48,11 +61,11 @@ default: $(CORE_SRC_OBJS) $(GAME_MAIN_OBJ)
 
 # --- PATTERN RULES ---
 $(BUILD_DIR)/%.o: %.c
-	@mkdir -p $(BUILD_DIR)
+	@$(MKDIR_CMD)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # --- CLEANUP ---
 clean:
-	@rm -f $(BUILD_DIR)/*.o
-	@rm -f $(BUILD_DIR)/*.exe
-	@rm -f game game.exe
+	@$(CLEAN_OBJS)
+	@$(CLEAN_EXES)
+	@$(CLEAN_GAME)
