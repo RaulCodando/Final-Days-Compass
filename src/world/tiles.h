@@ -10,7 +10,6 @@ typedef enum TileIDs{
     BLANK_TILE,
     GRASS_TILE,
     WATER_TILE,
-    LEAVES_TILE,
     TILE_COUNT
 } TileIDs;
 
