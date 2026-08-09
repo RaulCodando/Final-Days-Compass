@@ -7,6 +7,7 @@ typedef enum ObjectIDs{
     PLAYER,
     TEST_ENTITY,
     TREE_LOG,
+    TREE_TOP,
     OBJECT_COUNT
 } ObjectIDs;
 
