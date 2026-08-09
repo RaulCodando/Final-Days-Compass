@@ -34,7 +34,7 @@ int main() {
         return EXIT_FAILURE;
     }
 
-    if(build_tree(game, 640, 256, 0, 16) == false){
+    if(build_tree(game, 640, 256) == false){
         fprintf(stderr, "Erro ao criar tree.\n");
         game_destroy(game);
         return EXIT_FAILURE;
