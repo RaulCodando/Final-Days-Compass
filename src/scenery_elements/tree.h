@@ -6,6 +6,6 @@
 
 typedef struct Game Game;
 
-bool build_tree(Game *game, float x, float y, float collider_offset_x, int collider_width);
+bool build_tree(Game *game, float x, float y);
 
 #endif // TREE_H
