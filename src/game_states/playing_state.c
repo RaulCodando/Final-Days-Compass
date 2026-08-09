@@ -86,7 +86,7 @@ static void playing_state_render(Game *game, void *state_data){
         SceneryElement *scenery_element = (SceneryElement*)vector_get(game->scenery_elements, i);
         if (!scenery_element) continue;
 
-        float y_anchor = scenery_element_get_y_anchor(scenery_element);
+        float y_anchor = scenery_element->y_anchor;
         renderables[current_renderable] = renderable_object_create(RENDERABLE_SCENERY_ELEMENT, scenery_element, y_anchor);
         current_renderable++;
     }
