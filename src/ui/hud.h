@@ -25,7 +25,7 @@ typedef struct HudIconElement {
     int height;
     int state_count;
     int current_state_index;
-    Sprite **sprites;
+    Sprite *sprite;
 } HudIconElement;
 
 typedef struct HudContainerElement {
@@ -33,7 +33,7 @@ typedef struct HudContainerElement {
     int height;
     int state_count;
     int current_state_index;
-    Sprite **sprites;
+    Sprite *sprite;
     int childCount;
     HudElement **children;
 } HudContainerElement;
@@ -54,8 +54,8 @@ typedef struct HudElement {
 } HudElement;
 
 HudElement *hud_create_text(const char *text, int x, int y, bool center_x, bool center_y, TTF_Font *font);
-HudElement *hud_create_icon(SDL_Renderer *renderer, const char **sprite_paths, int state_count, int x, int y, bool center_x, bool center_y);
-HudElement *hud_create_container(SDL_Renderer *renderer, const char **sprite_paths, int state_count, int x, int y, int width, int height, bool center_x, bool center_y);
+HudElement *hud_create_icon(SDL_Renderer *renderer, Sprite* sprite, int x, int y, bool center_x, bool center_y);
+HudElement *hud_create_container(SDL_Renderer *renderer, Sprite* sprite, int x, int y, int width, int height, bool center_x, bool center_y);
 void hud_container_add_child(HudElement *container, HudElement *child);
 void hud_container_set_state(HudElement *container, int state_index);
 void hud_icon_set_state(HudElement *icon, int state_index);

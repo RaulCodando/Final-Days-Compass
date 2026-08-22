@@ -37,7 +37,7 @@ HudElement *hud_create_text(const char *text, int x, int y, bool center_x, bool 
     return element;
 }
 
-HudElement *hud_create_icon(SDL_Renderer *renderer, const char **sprite_paths, int state_count, int x, int y, bool center_x, bool center_y){
+HudElement *hud_create_icon(SDL_Renderer *renderer, Sprite* sprite, int x, int y, bool center_x, bool center_y){
     HudElement *element = (HudElement *)malloc(sizeof(HudElement));
     if (!element) {
         perror("Failed to allocate HudElement");
@@ -52,34 +52,10 @@ HudElement *hud_create_icon(SDL_Renderer *renderer, const char **sprite_paths, i
         exit(EXIT_FAILURE);
     }
 
-    element->data.icon->sprites = (Sprite **)malloc(state_count * sizeof(Sprite *));
-    if (!element->data.icon->sprites) {
-        perror("Failed to allocate sprites array");
-        free(element->data.icon);
-        free(element);
-        exit(EXIT_FAILURE);
-    }
-
-    for (int i = 0; i < state_count; i++) {
-        element->data.icon->sprites[i] = sprite_create(renderer, sprite_paths[i]);
-    }
-
-    if (!element->data.icon->sprites[0]) {
-        fprintf(stderr, "Error: Failed to load base sprite for HudIcon at path: %s\n", sprite_paths[0]);
-        for (int i = 0; i < state_count; i++) {
-            if (element->data.icon->sprites[i]) {
-                sprite_destroy(element->data.icon->sprites[i]);
-            }
-        }
-        free(element->data.icon->sprites);
-        free(element->data.icon);
-        free(element);
-        exit(EXIT_FAILURE);
-    }
-
-    element->data.icon->state_count = state_count;
-    element->data.icon->width = element->data.icon->sprites[0]->width;
-    element->data.icon->height = element->data.icon->sprites[0]->height;
+    element->data.icon->sprite = sprite;
+    element->data.icon->state_count = sprite->spritesheet->cols * sprite->spritesheet->rows;
+    element->data.icon->width = sprite->width;
+    element->data.icon->height = sprite->height;
     element->data.icon->current_state_index = 0;
     element->x = center_x ? (SCREEN_WIDTH - element->data.icon->width) / 2 : x;
     element->y = center_y ? (SCREEN_HEIGHT - element->data.icon->height) / 2 : y;
@@ -89,7 +65,7 @@ HudElement *hud_create_icon(SDL_Renderer *renderer, const char **sprite_paths, i
     return element;
 }
 
-HudElement *hud_create_container(SDL_Renderer *renderer, const char **sprite_paths, int state_count, int x, int y, int width, int height, bool center_x, bool center_y) {
+HudElement *hud_create_container(SDL_Renderer *renderer, Sprite* sprite, int x, int y, int width, int height, bool center_x, bool center_y) {
     HudElement *element = (HudElement *)malloc(sizeof(HudElement));
     if (!element) {
         perror("Failed to allocate HudElement");
@@ -104,38 +80,22 @@ HudElement *hud_create_container(SDL_Renderer *renderer, const char **sprite_pat
         exit(EXIT_FAILURE);
     }
 
-    element->data.container->sprites = NULL;
-    element->data.container->state_count = state_count;
     element->data.container->width = width; 
     element->data.container->height = height;
     element->data.container->childCount = 0;
     element->data.container->children = NULL;
     element->data.container->current_state_index = 0;
-
-    if (sprite_paths && state_count > 0) {
-        element->data.container->sprites = (Sprite **)malloc(state_count * sizeof(Sprite *));
-        if (!element->data.container->sprites) {
-            perror("Failed to allocate sprites array");
-            free(element->data.container);
-            free(element);
-            exit(EXIT_FAILURE);
-        }
-
-        for (int i = 0; i < state_count; i++) {
-            Sprite *sprite = sprite_create(renderer, sprite_paths[i]);
-            element->data.container->sprites[i] = sprite;
-        }
-
-        if(element->data.container->sprites[0] != NULL){
-            element->data.container->width = element->data.container->sprites[0]->width;
-            element->data.container->height = element->data.container->sprites[0]->height;
-        }
-    }
-
     element->x = center_x ? (SCREEN_WIDTH - element->data.container->width) / 2 : x;
     element->y = center_y ? (SCREEN_HEIGHT - element->data.container->height) / 2 : y;
     element->center_x = center_x;
     element->center_y = center_y;
+
+    if(sprite){
+        element->data.container->sprite = sprite;
+        element->data.container->state_count = sprite->spritesheet->cols * sprite->spritesheet->rows;
+        element->data.container->width = sprite->width; 
+        element->data.container->height = sprite->height;
+    }
 
     return element;
 }
@@ -204,9 +164,8 @@ void hud_container_set_state(HudElement *container, int state_index) {
 
     elem->current_state_index = state_index;
 
-    if (elem->sprites && elem->sprites[state_index]) {
-        elem->width = elem->sprites[state_index]->width;
-        elem->height = elem->sprites[state_index]->height;
+    if (elem->sprite) {
+        sprite_set_frame(elem->sprite, state_index);
     }
 }
 
@@ -219,9 +178,8 @@ void hud_icon_set_state(HudElement *icon, int state_index) {
 
     elem->current_state_index = state_index;
 
-    if (elem->sprites && elem->sprites[state_index]) {
-        elem->width = elem->sprites[state_index]->width;
-        elem->height = elem->sprites[state_index]->height;
+    if (elem->sprite) {
+        sprite_set_frame(elem->sprite, state_index);
     }
 }
 
