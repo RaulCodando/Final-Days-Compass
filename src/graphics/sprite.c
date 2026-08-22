@@ -4,9 +4,9 @@
 #include "../core/settings.h"
 #include <SDL3_image/SDL_image.h>
 
-Sprite *sprite_create(SDL_Renderer *renderer, const char *path) {
+SpriteSheet *sprite_sheet_create(SDL_Renderer *renderer, const char *path, int frame_width, int frame_height) {
     if (renderer == NULL || path == NULL) {
-        fprintf(stderr, "Error: Invalid parameters passed to sprite_create.\n");
+        fprintf(stderr, "Error: Invalid parameters passed to sprite_sheet_create.\n");
         return NULL;
     }
 
@@ -18,9 +18,9 @@ Sprite *sprite_create(SDL_Renderer *renderer, const char *path) {
 
     SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
 
-    Sprite *sprite = (Sprite*) malloc(sizeof(Sprite));
-    if (sprite == NULL) {
-        fprintf(stderr, "Error: Memory allocation failed for Sprite.\n");
+    SpriteSheet *sprite_sheet = (SpriteSheet*) malloc(sizeof(SpriteSheet));
+    if (sprite_sheet == NULL) {
+        fprintf(stderr, "Error: Memory allocation failed for SpriteSheet.\n");
         SDL_DestroyTexture(texture);
         return NULL;
     }
@@ -29,9 +29,41 @@ Sprite *sprite_create(SDL_Renderer *renderer, const char *path) {
     float height = 0.0f;
     SDL_GetTextureSize(texture, &width, &height);
 
-    sprite->texture = texture;
-    sprite->width = width;
-    sprite->height = height;
+    sprite_sheet->texture = texture;
+    sprite_sheet->frame_width = frame_width;
+    sprite_sheet->frame_height = frame_height;
+    sprite_sheet->cols = (int)width / frame_width;
+    sprite_sheet->rows = (int)height / frame_height;
+
+    return sprite_sheet;
+}
+
+Sprite *sprite_create_from_sheet(SpriteSheet *spritesheet, int width, int height){
+    if(!spritesheet || width <= 0 || height <= 0) return NULL;
+
+    Sprite *sprite = (Sprite*) malloc(sizeof(Sprite));
+    if (!sprite) return NULL;
+
+    sprite->texture = spritesheet->texture;
+    sprite->width = (float)width;
+    sprite->height = (float)height;
+    sprite->spritesheet = spritesheet;
+    sprite->current_frame_index = 0;
+    
+    SDL_Rect frame = {
+        0,
+        0,
+        width,
+        height
+    };
+
+    sprite->frame = malloc(sizeof(SDL_Rect));
+    if (!sprite->frame) {
+        free(sprite);
+        return NULL;
+    }
+
+    *(sprite->frame) = frame;
 
     return sprite;
 }
@@ -57,6 +89,8 @@ Sprite *sprite_create_blank(SDL_Renderer *renderer, int width, int height, SDL_C
 
     sprite->width = (float)width;
     sprite->height = (float)height;
+    sprite->spritesheet = NULL;
+    sprite->current_frame_index = 0;
 
     Uint8 r, g, b, a;
     SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a);
@@ -71,11 +105,36 @@ Sprite *sprite_create_blank(SDL_Renderer *renderer, int width, int height, SDL_C
     return sprite;
 }
 
+void sprite_set_frame(Sprite *sprite, int frame_index) {
+    if (!sprite || !sprite->spritesheet || !sprite->frame) return;
+
+    int max_frames = sprite->spritesheet->cols * sprite->spritesheet->rows;
+    if (frame_index < 0 || frame_index >= max_frames) {
+        frame_index = 0;
+    }
+
+    sprite->current_frame_index = frame_index;
+
+    int index_x = frame_index % sprite->spritesheet->cols;
+    int index_y = frame_index / sprite->spritesheet->cols;
+
+    sprite->frame->x = index_x * sprite->spritesheet->frame_width;
+    sprite->frame->y = index_y * sprite->spritesheet->frame_height;
+    sprite->frame->w = sprite->spritesheet->frame_width;
+    sprite->frame->h = sprite->spritesheet->frame_height;
+}
+
 void sprite_destroy(Sprite *sprite) {
-    if (sprite) {
-        if (sprite->texture) {
-            SDL_DestroyTexture(sprite->texture);
+    if (!sprite) return;
+    if (sprite->frame) free(sprite->frame);
+    free(sprite);
+}
+
+void sprite_sheet_destroy(SpriteSheet *spritesheet) {
+    if (spritesheet) {
+        if (spritesheet->texture) {
+            SDL_DestroyTexture(spritesheet->texture);
         }
-        free(sprite);
+        free(spritesheet);
     }
 }
