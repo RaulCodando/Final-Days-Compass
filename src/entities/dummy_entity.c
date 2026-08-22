@@ -14,7 +14,7 @@ static void test_entity_behavior_update(Entity *self, Game *game){
 bool test_entity_spawn(Game *game, float x, float y){
     if(!game) return false;
 
-    Sprite *sprite = asset_manager_get(game->renderer->sdl_renderer, game->asset_manager, TEST_ENTITY, "tests/assets/test_entity_sprite.png");
+    Sprite *sprite = asset_manager_get(game->renderer->sdl_renderer, game->asset_manager, TEST_ENTITY, "tests/assets/test_entity_sprite.png", 12,32);
     if(!sprite) return false;
 
     Entity *test_entity = entity_create(TEST_ENTITY, sprite, NULL, 10.0f, x, y);
