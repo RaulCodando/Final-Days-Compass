@@ -19,13 +19,13 @@ static void player_update(Entity* self, Game* game){
 bool player_spawn(Game *game, float x, float y){
     if(!game) return false;
 
-    Sprite *sprite = asset_manager_get(game->renderer->sdl_renderer, game->asset_manager, PLAYER, "assets/sprites/entity_sprites/player_sprite.png");
+    Sprite *sprite = asset_manager_get(game->renderer->sdl_renderer, game->asset_manager, PLAYER, "assets/sprites/entity_sprites/player_sprite.png", 12, 32);
     if(!sprite) return false;
 
     Entity *player = entity_create(PLAYER, sprite, NULL, 10.0f, x, y);
     if (!player) return false;
     
-    entity_init_collider(player, 10.0f, 2.0f, 1.0f, 30.0f);
+    entity_init_collider(player, 8.0f, 2.0f, 2.0f, 30.0f);
     player->update_behavior = player_update;
 
     return manage_entities_add(game, player);
