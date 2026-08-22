@@ -1,24 +1,24 @@
 #ifndef TILES_H
 #define TILES_H
 
-#include "../graphics/sprite.h"
+#include <stdbool.h>
 #include <SDL3/SDL.h>
+#include "../core/id.h"
+#include "../graphics/sprite.h"
 
-typedef struct Renderer Renderer;
+typedef struct Tile {
+    ID id;
+    int frame_index;
+    bool is_solid;  
+} Tile;
 
-typedef enum TileIDs{
-    BLANK_TILE,
-    GRASS_TILE,
-    WATER_TILE,
-    TILE_COUNT
-} TileIDs;
-
-typedef struct TileSet{
-    Sprite *sprites[TILE_COUNT];
+typedef struct TileSet {
+    SpriteSheet *spritesheet; 
+    Sprite *render_sprite;    
 } TileSet;
 
-TileSet *tileset_create(SDL_Renderer *renderer, int width, int height, SDL_Color color);
+TileSet *tileset_create(SpriteSheet *sheet);
 void tileset_destroy(TileSet *tileset);
-Sprite *tileset_get_sprite(TileSet *tileset, TileIDs ID);
+void tileset_render_tile(SDL_Renderer *renderer, TileSet *tileset, Tile *tile, int screen_x, int screen_y);
 
 #endif // TILES_H
