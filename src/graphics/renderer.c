@@ -168,8 +168,8 @@ void renderer_draw_hud_element(Renderer *renderer, struct HudElement *element) {
             HudContainerElement *container = element->data.container;
             if (!container) break;
 
-            if (container->sprites && container->sprites[container->current_state_index]) {
-                Sprite *sprite = container->sprites[container->current_state_index];
+            if (container->sprite) {
+                Sprite *sprite = container->sprite;
                 renderer_draw(renderer, element->x, element->y, sprite);
             }
 
@@ -208,9 +208,9 @@ void renderer_draw_hud_element(Renderer *renderer, struct HudElement *element) {
 
         case HUD_ICON: {
             HudIconElement *icon = element->data.icon;
-            if (!icon || !icon->sprites) break;
+            if (!icon) break;
 
-            Sprite *sprite = icon->sprites[icon->current_state_index];
+            Sprite *sprite = icon->sprite;
             if (sprite) {
                 renderer_draw(renderer, element->x, element->y, sprite);
             }
