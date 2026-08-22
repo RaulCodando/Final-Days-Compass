@@ -5,7 +5,7 @@
 #include "../managers/world_manager.h"
 
 bool build_tree_trunk(Game *game, float x, float y){
-    Sprite *sprite = asset_manager_get(game->renderer->sdl_renderer, game->asset_manager, TREE_LOG, "assets/sprites/scenery_element_sprites/TreeLogSprite.png");
+    Sprite *sprite = asset_manager_get(game->renderer->sdl_renderer, game->asset_manager, TREE_LOG, "assets/sprites/scenery_element_sprites/TreeLogSprite.png", 16, 64);
     if(!sprite) return false;
 
     SceneryElement *scenery_element = scenery_element_create(TREE_LOG, x, y, sprite);
