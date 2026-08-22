@@ -1,0 +1,17 @@
+#ifndef ID_H
+#define ID_H
+
+typedef enum ID {
+    ID_BLANK_TILE,
+    ID_GRASS_TILE,
+    ID_WATER_TILE,
+    ID_PLAYER,
+    ID_TEST_ENTITY,
+    ID_TREE_LOG,
+    ID_TREE_TOP,
+    ID_HUD_GENERIC_CONTAINER,
+    ID_HUD_BUTTON_CONTAINER,
+    ID_COUNT
+} ID;
+
+#endif //ID_H
