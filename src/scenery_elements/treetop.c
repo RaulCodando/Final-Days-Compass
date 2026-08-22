@@ -5,7 +5,7 @@
 #include "../managers/world_manager.h"
 
 SceneryElement *build_treetop(Game *game, float x, float y){
-    Sprite *sprite = asset_manager_get(game->renderer->sdl_renderer, game->asset_manager, TREE_TOP, "assets/sprites/scenery_element_sprites/TreeTopSprite.png");
+    Sprite *sprite = asset_manager_get(game->renderer->sdl_renderer, game->asset_manager, TREE_TOP, "assets/sprites/scenery_element_sprites/TreeTopSprite.png", 112, 64);
     if(!sprite) return NULL;
 
     SceneryElement *scenery_element = scenery_element_create(TREE_TOP, x, y, sprite);
